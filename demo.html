@@ -1,0 +1,52 @@
+<html>
+
+<head>
+    <title>RWI</title>
+    <meta charset="utf-8"></meta>
+</head>
+
+<body>
+    <canvas id="webGL" style="width:500px;height;500px"></canvas>
+
+    <script>
+        var canvasElement = document.getElementById("webGL");
+        var context = canvasElement.getContext('webgl');
+
+        var vertexShaderSource =
+            "void main(){" +
+            "    gl_PointSize = 20" +
+            "    gl_Position = vec4(0.5,0.0,0.0,1.0)" +
+            "}";
+
+        var fragmentShaderSource =
+            "void main(){" +
+            "    gl_FragColor = vec4(1.0,0.0,0.0,1.0)" +
+            "}";
+
+        var program = initShader(context, vertexShaderSource, fragmentShaderSource);
+        //context.draw();
+
+        function initShader(gl, vertexShaderSource, fragmentShaderSource) {
+            var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+            var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+            gl.shaderSource(vertexShader, vertexShaderSource);
+            gl.shaderSource(fragmentShader, fragmentShaderSource);
+
+            gl.compileShader(vertexShader);
+            gl.compileShader(fragmentShader);
+
+            var program = gl.createProgram();
+            gl.attachShader(program,vertexShader);
+            gl.attachShader(program,fragmentShader);
+
+            gl.linkProgram(program);
+
+            gl.useProgram(program);
+
+            return program;
+        }
+    </script>
+</body>
+
+</html>
