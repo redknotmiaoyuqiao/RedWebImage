@@ -6,25 +6,31 @@
 </head>
 
 <body>
-    <canvas id="webGL" style="width:500px;height;500px"></canvas>
+    <canvas id="webGL" style="width:500px;height:500px"></canvas>
 
     <script>
         var canvasElement = document.getElementById("webGL");
         var context = canvasElement.getContext('webgl');
 
+        context.clearColor(1.0,1.0,0.0,1.0);
+        context.clear(context.COLOR_BUFFER_BIT);
+
         var vertexShaderSource =
             "void main(){" +
-            "    gl_PointSize = 20" +
-            "    gl_Position = vec4(0.5,0.0,0.0,1.0)" +
+            "    gl_PointSize = 20.0;" +
+            "    gl_Position = vec4(0.5,0.0,0.0,1.0);" +
             "}";
 
         var fragmentShaderSource =
             "void main(){" +
-            "    gl_FragColor = vec4(1.0,0.0,0.0,1.0)" +
+            "    gl_FragColor = vec4(1.0,0.0,0.0,1.0);" +
             "}";
 
         var program = initShader(context, vertexShaderSource, fragmentShaderSource);
-        //context.draw();
+
+
+
+        context.drawArrays(context.POINTS,0,1);
 
         function initShader(gl, vertexShaderSource, fragmentShaderSource) {
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -43,6 +49,9 @@
             gl.linkProgram(program);
 
             gl.useProgram(program);
+
+            console.log(gl.getShaderInfoLog(vertexShader));
+            console.log(gl.getShaderInfoLog(fragmentShader));
 
             return program;
         }
