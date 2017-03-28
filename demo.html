@@ -27,11 +27,11 @@
             "varying vec2 varyTexPos;" +
             "uniform sampler2D mainTexture;" +
             "void main(){" +
-            "    vec4 color = texture2D(mainTexture,varyTexPos);" + 
+            "    vec4 color = texture2D(mainTexture,vec2(varyTexPos.x + 0.2,varyTexPos.y + 0.2));" + 
             "    float r = color.x;" +
             "    float g = color.g;" +
             "    float b = color.b;" +
-            "    gl_FragColor = vec4(r,1.0,1.0,1.0);" +
+            "    gl_FragColor = vec4(r,g,b,1.0);" +
             "}";
 
         var program = initShader(context, vertexShaderSource, fragmentShaderSource);
@@ -75,22 +75,12 @@
             context.activeTexture(context.TEXTURE0);
             context.bindTexture(context.TEXTURE_2D,texture);
 
-            dat=[];
-            for(i=0;i<32;i++)for(j=0;j<32;j++)
-                k=i<16^j<16?255:0,dat.push(k,k,k);
-
             context.texParameteri(context.TEXTURE_2D,context.TEXTURE_MIN_FILTER,context.LINEAR);
             context.texParameteri(context.TEXTURE_2D,context.TEXTURE_MAG_FILTER,context.LINEAR);
             context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_S,context.CLAMP_TO_EDGE);
             context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_T,context.CLAMP_TO_EDGE);
 
-            console.log(img.naturalHeight);
-            console.log(img.naturalWidth);
             context.texImage2D(context.TEXTURE_2D,0,context.RGBA,context.RGBA,context.UNSIGNED_BYTE,img);
-            //context.texImage2D(context.TEXTURE_2D,0,context.RGB,32,32,0,context.RGB,context.UNSIGNED_BYTE,new Uint8Array(dat));
-
-            //context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_S,context.CLAMP_TO_EDGE);
-            //context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_T,context.CLAMP_TO_EDGE);
 
             context.clearColor(0.0,1.0,1.0,1.0);
             context.clear(context.COLOR_BUFFER_BIT);
