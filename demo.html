@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <canvas id="webGL" style="width:500px;height:500px"></canvas>
+    <canvas id="webGL" width="500px" height="500px"></canvas>
 
     <script>
         var canvasElement = document.getElementById("webGL");
@@ -16,9 +16,9 @@
         context.clear(context.COLOR_BUFFER_BIT);
 
         var vertexShaderSource =
+            "attribute vec2 pos;" +
             "void main(){" +
-            "    gl_PointSize = 20.0;" +
-            "    gl_Position = vec4(0.0,0.0,0.0,1.0);" +
+            "    gl_Position = vec4(pos.xy * 0.5,0.0,1.0);" +
             "}";
 
         var fragmentShaderSource =
@@ -28,7 +28,29 @@
 
         var program = initShader(context, vertexShaderSource, fragmentShaderSource);
 
-        context.drawArrays(context.POINTS, 0, 1);
+
+        /** start设置定点数据 **/
+        var data = new Float32Array([-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0]);
+        var buffer = context.createBuffer();
+
+        context.bindBuffer(context.ARRAY_BUFFER, buffer);
+        context.bufferData(context.ARRAY_BUFFER, data, context.STATIC_DRAW);
+
+        var posLocation = context.getAttribLocation(program, 'pos');
+        context.vertexAttribPointer(posLocation, 2, context.FLOAT, false, 0, 0);
+        context.enableVertexAttribArray(posLocation);
+        /** end设置定点数据 **/
+
+        /** start设置索引数据 **/
+        var indicesData = new Uint8Array([0, 1, 2, 0, 2, 3]);
+        var indexBuffer = context.createBuffer();
+        context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        context.bufferData(context.ELEMENT_ARRAY_BUFFER, indicesData, context.STATIC_DRAW);
+
+        context.drawElements(context.TRIANGLES, indicesData.length, context.UNSIGNED_BYTE, 0);
+        /** end设置索引数据 **/
+
+
 
         function initShader(gl, vertexShaderSource, fragmentShaderSource) {
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -48,8 +70,8 @@
 
             gl.useProgram(program);
 
-            console.log(gl.getShaderInfoLog(vertexShader));
-            console.log(gl.getShaderInfoLog(fragmentShader));
+            console.error(gl.getShaderInfoLog(vertexShader));
+            console.error(gl.getShaderInfoLog(fragmentShader));
 
             return program;
         }
