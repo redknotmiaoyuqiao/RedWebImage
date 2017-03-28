@@ -6,28 +6,47 @@
 </head>
 
 <body>
-    <canvas id="webGL" width="500px" height="500px"></canvas>
-
+    <center>
+        <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
+    </center>
     <script>
         var canvasElement = document.getElementById("webGL");
         var context = canvasElement.getContext('webgl');
 
-        context.clearColor(1.0, 1.0, 0.0, 1.0);
-        context.clear(context.COLOR_BUFFER_BIT);
-
         var vertexShaderSource =
             "attribute vec2 pos;" +
+            "attribute vec2 texPos;" +
+            "varying vec2 varyTexPos;" +
             "void main(){" +
-            "    gl_Position = vec4(pos.xy * 0.5,0.0,1.0);" +
+            "    gl_Position = vec4(pos.xy,0.0,1.0);" +
+            "    varyTexPos = texPos;" +
             "}";
 
         var fragmentShaderSource =
+            "precision lowp float;" +
+            "varying vec2 varyTexPos;" +
+            "uniform sampler2D mainTexture;" +
             "void main(){" +
-            "    gl_FragColor = vec4(1.0,0.0,0.0,1.0);" +
+            "    vec4 color = texture2D(mainTexture,varyTexPos);" + 
+            "    float r = color.x;" +
+            "    float g = color.g;" +
+            "    float b = color.b;" +
+            "    gl_FragColor = vec4(r,1.0,1.0,1.0);" +
             "}";
 
         var program = initShader(context, vertexShaderSource, fragmentShaderSource);
 
+        /** start纹理坐标 **/
+        var dataCoor = new Float32Array([0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]);
+        var bufferCoor = context.createBuffer();
+
+        context.bindBuffer(context.ARRAY_BUFFER, bufferCoor);
+        context.bufferData(context.ARRAY_BUFFER, dataCoor, context.STATIC_DRAW);
+
+        var posCoorLocation = context.getAttribLocation(program, 'texPos');
+        context.vertexAttribPointer(posCoorLocation, 2, context.FLOAT, false, 0, 0);
+        context.enableVertexAttribArray(posCoorLocation);
+        /** end纹理坐标 **/
 
         /** start设置定点数据 **/
         var data = new Float32Array([-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0]);
@@ -46,11 +65,43 @@
         var indexBuffer = context.createBuffer();
         context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, indexBuffer);
         context.bufferData(context.ELEMENT_ARRAY_BUFFER, indicesData, context.STATIC_DRAW);
-
-        context.drawElements(context.TRIANGLES, indicesData.length, context.UNSIGNED_BYTE, 0);
         /** end设置索引数据 **/
 
+        
+        loadImage("img/miaowu.jpg", function(img) {
+            /** start贴图 **/
+            var texture = context.createTexture();
+            context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL,1);
+            context.activeTexture(context.TEXTURE0);
+            context.bindTexture(context.TEXTURE_2D,texture);
 
+            dat=[];
+            for(i=0;i<32;i++)for(j=0;j<32;j++)
+                k=i<16^j<16?255:0,dat.push(k,k,k);
+
+            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_MIN_FILTER,context.LINEAR);
+            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_MAG_FILTER,context.LINEAR);
+            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_S,context.CLAMP_TO_EDGE);
+            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_T,context.CLAMP_TO_EDGE);
+
+            console.log(img.naturalHeight);
+            console.log(img.naturalWidth);
+            context.texImage2D(context.TEXTURE_2D,0,context.RGBA,context.RGBA,context.UNSIGNED_BYTE,img);
+            //context.texImage2D(context.TEXTURE_2D,0,context.RGB,32,32,0,context.RGB,context.UNSIGNED_BYTE,new Uint8Array(dat));
+
+            //context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_S,context.CLAMP_TO_EDGE);
+            //context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_T,context.CLAMP_TO_EDGE);
+
+            context.clearColor(0.0,1.0,1.0,1.0);
+            context.clear(context.COLOR_BUFFER_BIT);
+
+            var texLocation = context.getUniformLocation(program,'mainTexture');
+            context.uniform1i(texLocation,0);
+
+            context.drawElements(context.TRIANGLES, indicesData.length, context.UNSIGNED_BYTE, 0);
+        });
+        /** end贴图 **/
+    
 
         function initShader(gl, vertexShaderSource, fragmentShaderSource) {
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -74,6 +125,14 @@
             console.error(gl.getShaderInfoLog(fragmentShader));
 
             return program;
+        }
+
+        function loadImage(url, cb) {
+            var img = new Image();
+            img.src = url;
+            img.onload = function() {
+                cb(img);
+            };
         }
     </script>
 </body>
