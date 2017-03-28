@@ -12,13 +12,13 @@
         var canvasElement = document.getElementById("webGL");
         var context = canvasElement.getContext('webgl');
 
-        context.clearColor(1.0,1.0,0.0,1.0);
+        context.clearColor(1.0, 1.0, 0.0, 1.0);
         context.clear(context.COLOR_BUFFER_BIT);
 
         var vertexShaderSource =
             "void main(){" +
             "    gl_PointSize = 20.0;" +
-            "    gl_Position = vec4(0.5,0.0,0.0,1.0);" +
+            "    gl_Position = vec4(0.0,0.0,0.0,1.0);" +
             "}";
 
         var fragmentShaderSource =
@@ -28,9 +28,7 @@
 
         var program = initShader(context, vertexShaderSource, fragmentShaderSource);
 
-
-
-        context.drawArrays(context.POINTS,0,1);
+        context.drawArrays(context.POINTS, 0, 1);
 
         function initShader(gl, vertexShaderSource, fragmentShaderSource) {
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -43,8 +41,8 @@
             gl.compileShader(fragmentShader);
 
             var program = gl.createProgram();
-            gl.attachShader(program,vertexShader);
-            gl.attachShader(program,fragmentShader);
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
 
             gl.linkProgram(program);
 
