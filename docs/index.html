@@ -10,10 +10,10 @@
         <h1>There is RWI (Red Web Image) Demo</h1>
     </center>
     <center>
-        <h2>对，我在盯着你看～～～</h2>
+        <h2>来，看这里～～～～</h2>
     </center>
     <center>
-        <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
+        <canvas id="webGL" width="999px" height="725px" style="width:70%"></canvas>
     </center>
     <script>
         var canvasElement = document.getElementById("webGL");
@@ -77,8 +77,8 @@
         context.bufferData(context.ELEMENT_ARRAY_BUFFER, indicesData, context.STATIC_DRAW);
         /** end设置索引数据 **/
 
-        
-        loadImage("miaowu.jpg", function(img) {
+
+        loadImage("girl2.jpg", function(img) {
             /** start贴图 **/
             var texture = context.createTexture();
             context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL,1);
@@ -95,6 +95,9 @@
             var texLocation = context.getUniformLocation(program,'mainTexture');
             context.uniform1i(texLocation,0);
 
+            console.log(img.naturalWidth);
+            console.log(img.naturalHeight);
+
             draw()
         });
         /** end贴图 **/
@@ -104,7 +107,7 @@
             setInterval(run,10);
         }
 
-        var changeVal = 0; 
+        var changeVal = 0;
 
         function run(){
             context.clearColor(1.0,1.0,1.0,1.0);
@@ -116,7 +119,7 @@
 
             context.drawElements(context.TRIANGLES, indicesData.length, context.UNSIGNED_BYTE, 0);
         }
-    
+
 
         function initShader(gl, vertexShaderSource, fragmentShaderSource) {
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -153,4 +156,3 @@
 </body>
 
 </html>
-
