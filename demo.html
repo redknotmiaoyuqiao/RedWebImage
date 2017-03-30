@@ -9,30 +9,32 @@
     <center>
         <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
     </center>
+    <script id="vshader" type="x-shader/x-vertex">
+        attribute vec2 pos;
+        attribute vec2 texPos;
+        varying vec2 varyTexPos;
+        void main(){
+            gl_Position = vec4(pos.xy,0.0,1.0); varyTexPos = texPos;
+        }
+    </script>
+    <script id="fshader" type="x-shader/x-vertex">
+        precision lowp float;
+        varying vec2 varyTexPos;
+        uniform sampler2D mainTexture;
+        void main(){
+            vec4 color = texture2D(mainTexture,vec2(varyTexPos.x + 0.2,varyTexPos.y + 0.2));
+            float r = color.r;
+            float g = color.g;
+            float b = color.b;
+            gl_FragColor = vec4(r,g,b,1.0);
+        }
+    </script>
     <script>
         var canvasElement = document.getElementById("webGL");
         var context = canvasElement.getContext('webgl');
 
-        var vertexShaderSource =
-            "attribute vec2 pos;" +
-            "attribute vec2 texPos;" +
-            "varying vec2 varyTexPos;" +
-            "void main(){" +
-            "    gl_Position = vec4(pos.xy,0.0,1.0);" +
-            "    varyTexPos = texPos;" +
-            "}";
-
-        var fragmentShaderSource =
-            "precision lowp float;" +
-            "varying vec2 varyTexPos;" +
-            "uniform sampler2D mainTexture;" +
-            "void main(){" +
-            "    vec4 color = texture2D(mainTexture,vec2(varyTexPos.x + 0.2,varyTexPos.y + 0.2));" + 
-            "    float r = color.x;" +
-            "    float g = color.g;" +
-            "    float b = color.b;" +
-            "    gl_FragColor = vec4(r,g,b,1.0);" +
-            "}";
+        var vertexShaderSource = document.getElementById("vshader").textContent;
+        var fragmentShaderSource = document.getElementById("fshader").textContent;
 
         var program = initShader(context, vertexShaderSource, fragmentShaderSource);
 
@@ -67,31 +69,31 @@
         context.bufferData(context.ELEMENT_ARRAY_BUFFER, indicesData, context.STATIC_DRAW);
         /** end设置索引数据 **/
 
-        
+
         loadImage("img/miaowu.jpg", function(img) {
             /** start贴图 **/
             var texture = context.createTexture();
-            context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL,1);
+            context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, 1);
             context.activeTexture(context.TEXTURE0);
-            context.bindTexture(context.TEXTURE_2D,texture);
+            context.bindTexture(context.TEXTURE_2D, texture);
 
-            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_MIN_FILTER,context.LINEAR);
-            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_MAG_FILTER,context.LINEAR);
-            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_S,context.CLAMP_TO_EDGE);
-            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_T,context.CLAMP_TO_EDGE);
+            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
 
-            context.texImage2D(context.TEXTURE_2D,0,context.RGBA,context.RGBA,context.UNSIGNED_BYTE,img);
+            context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, img);
 
-            context.clearColor(0.0,1.0,1.0,1.0);
+            context.clearColor(0.0, 1.0, 1.0, 1.0);
             context.clear(context.COLOR_BUFFER_BIT);
 
-            var texLocation = context.getUniformLocation(program,'mainTexture');
-            context.uniform1i(texLocation,0);
+            var texLocation = context.getUniformLocation(program, 'mainTexture');
+            context.uniform1i(texLocation, 0);
 
             context.drawElements(context.TRIANGLES, indicesData.length, context.UNSIGNED_BYTE, 0);
         });
         /** end贴图 **/
-    
+
 
         function initShader(gl, vertexShaderSource, fragmentShaderSource) {
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
