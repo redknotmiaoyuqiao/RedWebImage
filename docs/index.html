@@ -3,10 +3,6 @@
 <head>
     <title>RWI</title>
     <meta charset="utf-8"></meta>
-
-    <script src="../lib/GL/GLProgram.js"></script>
-    <script src="../lib/GL/GLShader.js"></script>
-    <script src="../lib/GL/GLTexture.js"></script>
 </head>
 
 <body>
@@ -39,125 +35,6 @@
             vec2 uv = varyTexPos.xy;
             float waveu = sin((uv.y + floatVal) * 20.0) * 0.5 * 0.05 * stongth;
             gl_FragColor = texture2D(mainTexture, uv + vec2(waveu, 0));
-        }
-    </script>
-    <script>
-        var canvasElement = document.getElementById("webGL");
-        var context = canvasElement.getContext('webgl' || 'experimental-webgl');
-
-
-
-
-
-        /**** start 创建Program ****/
-        var myProgram = Object.create(GLProgram);
-        myProgram.Init(context);
-
-        var VertexShader = Object.create(GLShader);
-        VertexShader.Init(context,context.VERTEX_SHADER,document.getElementById("vshader").textContent);
-        VertexShader.CompileShader();
-
-        var FragmentShader = Object.create(GLShader);
-        FragmentShader.Init(context,context.FRAGMENT_SHADER,document.getElementById("fshader").textContent);
-        FragmentShader.CompileShader();
-
-        myProgram.AddShader(VertexShader);
-        myProgram.AddShader(FragmentShader);
-
-        myProgram.LinkProgram();
-        myProgram.UseProgram();
-        /**** end 创建Program ****/
-        var program = myProgram.programId;
-
-
-
-
-        
-        
-
-        /** start纹理坐标 **/
-        var dataCoor = new Float32Array([0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]);
-        var bufferCoor = context.createBuffer();
-
-        context.bindBuffer(context.ARRAY_BUFFER, bufferCoor);
-        context.bufferData(context.ARRAY_BUFFER, dataCoor, context.STATIC_DRAW);
-
-        var posCoorLocation = context.getAttribLocation(program, 'texPos');
-        context.vertexAttribPointer(posCoorLocation, 2, context.FLOAT, false, 0, 0);
-        context.enableVertexAttribArray(posCoorLocation);
-        /** end纹理坐标 **/
-
-
-
-
-
-        /** start设置定点数据 **/
-        var data = new Float32Array([-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0]);
-        var buffer = context.createBuffer();
-
-        context.bindBuffer(context.ARRAY_BUFFER, buffer);
-        context.bufferData(context.ARRAY_BUFFER, data, context.STATIC_DRAW);
-
-        var posLocation = context.getAttribLocation(program, 'pos');
-        context.vertexAttribPointer(posLocation, 2, context.FLOAT, false, 0, 0);
-        context.enableVertexAttribArray(posLocation);
-        /** end设置定点数据 **/
-
-
-
-
-
-
-        /** start设置索引数据 **/
-        var indicesData = new Uint8Array([0, 1, 2, 0, 2, 3]);
-        var indexBuffer = context.createBuffer();
-        context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        context.bufferData(context.ELEMENT_ARRAY_BUFFER, indicesData, context.STATIC_DRAW);
-        /** end设置索引数据 **/
-
-
-        loadImage("girl2.jpg", function(img) {
-            /** start贴图 **/
-            var GLTextureObj = Object.create(GLTexture);
-            GLTextureObj.Init(context);
-            GLTextureObj.SetImage(img,context.TEXTURE0);
-            var texture = GLTextureObj.textureId;
-
-            context.clearColor(0.0, 1.0, 1.0, 1.0);
-            context.clear(context.COLOR_BUFFER_BIT);
-
-            var texLocation = context.getUniformLocation(program, 'mainTexture');
-            context.uniform1i(texLocation, 0);
-
-            draw();
-        });
-        /** end贴图 **/
-
-        function draw()
-        {
-            setInterval(run,10);
-        }
-
-        var changeVal = 0;
-
-        function run(){
-            context.clearColor(1.0,1.0,1.0,1.0);
-            context.clear(context.COLOR_BUFFER_BIT);
-
-            var floatValLocation = context.getUniformLocation(program,'floatVal');
-            changeVal = changeVal + 0.005;
-            context.uniform1f(floatValLocation,changeVal);
-
-            context.drawElements(context.TRIANGLES, indicesData.length, context.UNSIGNED_BYTE, 0);
-        }
-
-        function loadImage(url, cb) {
-            var img = new Image();
-            img.crossOrigin = "Anonymous"
-            img.src = url;
-            img.onload = function() {
-                cb(img);
-            };
         }
     </script>
 </body>
