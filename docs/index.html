@@ -1,42 +1,46 @@
 <html>
+    <head>
+        <title>SimpleImage</title>
+        <meta charset="utf-8"></meta>
 
-<head>
-    <title>RWI</title>
-    <meta charset="utf-8"></meta>
-</head>
+        <script src="red-web-image.js"></script>
+    </head>
+    <body>
+        <script id="vshader" type="x-shader/x-vertex">
+            attribute vec2 pos;
+            attribute vec2 texPos;
+            varying vec2 varyTexPos;
+            void main(){
+                gl_Position = vec4(pos.xy,0.0,1.0);
+                varyTexPos = texPos;
+            }
+        </script>
+        <script id="fshader" type="x-shader/x-vertex">
+            precision lowp float;
+            varying vec2 varyTexPos;
+            uniform sampler2D mainTexture;
+            uniform float floatVal;
 
-<body>
-    <center>
-        <h1>There is RWI (Red Web Image) Demo</h1>
-    </center>
-    <center>
-        <h2>来，看这里～～～～</h2>
-    </center>
-    <center>
-        <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
-    </center>
-    <script id="vshader" type="x-shader/x-vertex">
-        attribute vec2 pos;
-        attribute vec2 texPos;
-        varying vec2 varyTexPos;
-        void main(){
-            gl_Position = vec4(pos.xy,0.0,1.0);
-            varyTexPos = texPos;
-        }
-    </script>
-    <script id="fshader" type="x-shader/x-vertex">
-        precision lowp float;
-        varying vec2 varyTexPos;
-        uniform sampler2D mainTexture;
-        uniform float floatVal;
-
-        void main(){
-            float stongth = 0.2;
-            vec2 uv = varyTexPos.xy;
-            float waveu = sin((uv.y + floatVal) * 20.0) * 0.5 * 0.05 * stongth;
-            gl_FragColor = texture2D(mainTexture, uv + vec2(waveu, 0));
-        }
-    </script>
-</body>
-
+            void main(){
+                float stongth = 1.0;
+                vec2 uv = varyTexPos.xy;
+                float waveu = sin((uv.y + floatVal) * 20.0) * 0.5 * 0.05 * stongth;
+                gl_FragColor = texture2D(mainTexture, uv + vec2(waveu, waveu));
+            }
+        </script>
+        <center>
+            <h1>There is RWI (Red Web Image) Demo</h1>
+        </center>
+        <center>
+            <h2>来，看这里～～～～</h2>
+        </center>
+        <center>
+            <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
+        </center>
+        <script>
+            var simpleImage = Object.create(SimpleImage);
+            simpleImage.Init("webGL");
+            simpleImage.SetImageUrl("img/miaowu.jpg");
+        </script>
+    </body>
 </html>
