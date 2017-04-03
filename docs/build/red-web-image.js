@@ -1,4 +1,5 @@
-/**** 创建时间：2017-04-04 06:31:06 ****/
+/**** 创建时间为:2017-04-04 07:43:36 ****/
+
 
 /**** GLBuffer.js ****/
 
@@ -219,10 +220,10 @@ var SimpleImage = {
         program.Init(this.context);
 
         vertexShader = Object.create(GLShader);
-        vertexShader.Init(this.context,this.context.VERTEX_SHADER,document.getElementById("vshader").textContent);
+        vertexShader.Init(this.context,this.context.VERTEX_SHADER,vertex_wave);
         vertexShader.CompileShader();
         fragmentShader = Object.create(GLShader);
-        fragmentShader.Init(this.context,this.context.FRAGMENT_SHADER,document.getElementById("fshader").textContent);
+        fragmentShader.Init(this.context,this.context.FRAGMENT_SHADER,fragment_wave);
         fragmentShader.CompileShader();
 
         program.AddShader(vertexShader);

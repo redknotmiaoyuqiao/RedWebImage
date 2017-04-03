@@ -1,4 +1,4 @@
-/**** 创建时间为:2017-04-04 07:43:52 ****/
+/**** 创建时间为:2017-04-04 07:43:36 ****/
 
 /**** Vertex ****/
 var vertex_ripple = "attribute vec2 pos;attribute vec2 texPos;varying vec2 varyTexPos;void main(){    gl_Position = vec4(pos.xy,0.0,1.0);    varyTexPos = texPos;}";
