@@ -3,6 +3,9 @@
 <head>
     <title>RWI</title>
     <meta charset="utf-8"></meta>
+
+    <script src="lib/GL/GLProgram.js"></script>
+    <script src="lib/GL/GLShader.js"></script>
 </head>
 
 <body>
@@ -33,10 +36,37 @@
         var canvasElement = document.getElementById("webGL");
         var context = canvasElement.getContext('webgl');
 
+        var myProgram = Object.create(GLProgram);
+        myProgram.Init(context);
+
+        var VertexShader = Object.create(GLShader);
+        VertexShader.Init(context,context.VERTEX_SHADER);
+        VertexShader.SetSourceByText(document.getElementById("vshader").textContent);
+        VertexShader.CompileShader();
+
+        var FragmentShader = Object.create(GLShader);
+        FragmentShader.Init(context,context.FRAGMENT_SHADER);
+        FragmentShader.SetSourceByText(document.getElementById("fshader").textContent);
+        FragmentShader.CompileShader();
+
+        myProgram.AddShader(VertexShader);
+        myProgram.AddShader(FragmentShader);
+
+        myProgram.LinkProgram();
+        myProgram.UseProgram();
+        
+
+        var program = myProgram.programId;
+
+        var canvasElement = document.getElementById("webGL");
+        var context = canvasElement.getContext('webgl');
+
+        /*
         var vertexShaderSource = document.getElementById("vshader").textContent;
         var fragmentShaderSource = document.getElementById("fshader").textContent;
 
         var program = initShader(context, vertexShaderSource, fragmentShaderSource);
+        */
 
         /** start纹理坐标 **/
         var dataCoor = new Float32Array([0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]);
@@ -70,7 +100,7 @@
         /** end设置索引数据 **/
 
 
-        loadImage("img/miaowu.jpg", function(img) {
+        loadImage("http://image.dcniupai.com/o_1bckbio6ebv9seca4gk6102qpg.jpg", function(img) {
             /** start贴图 **/
             var texture = context.createTexture();
             context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, 1);
@@ -94,7 +124,7 @@
         });
         /** end贴图 **/
 
-
+        /*
         function initShader(gl, vertexShaderSource, fragmentShaderSource) {
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
             var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -118,9 +148,11 @@
 
             return program;
         }
+        */
 
         function loadImage(url, cb) {
             var img = new Image();
+            img.crossOrigin = "Anonymous"
             img.src = url;
             img.onload = function() {
                 cb(img);
