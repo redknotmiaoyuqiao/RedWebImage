@@ -3,6 +3,10 @@
 <head>
     <title>RWI</title>
     <meta charset="utf-8"></meta>
+
+    <script src="../lib/GL/GLProgram.js"></script>
+    <script src="../lib/GL/GLShader.js"></script>
+    <script src="../lib/GL/GLTexture.js"></script>
 </head>
 
 <body>
@@ -13,9 +17,8 @@
         <h2>来，看这里～～～～</h2>
     </center>
     <center>
-        <canvas id="webGL" width="999px" height="725px" style="width:70%"></canvas>
+        <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
     </center>
-
     <script id="vshader" type="x-shader/x-vertex">
         attribute vec2 pos;
         attribute vec2 texPos;
@@ -40,16 +43,37 @@
     </script>
     <script>
         var canvasElement = document.getElementById("webGL");
-        var context = canvasElement.getContext('webgl');
+        var context = canvasElement.getContext('webgl' || 'experimental-webgl');
 
-        var vertexShaderSource = document.getElementById("vshader").textContent;
-        var fragmentShaderSource = document.getElementById("fshader").textContent;
 
-        var program = initShader(context, vertexShaderSource, fragmentShaderSource);
 
-        /** floatVal **/
 
-        /** floatVal **/
+
+        /**** start 创建Program ****/
+        var myProgram = Object.create(GLProgram);
+        myProgram.Init(context);
+
+        var VertexShader = Object.create(GLShader);
+        VertexShader.Init(context,context.VERTEX_SHADER,document.getElementById("vshader").textContent);
+        VertexShader.CompileShader();
+
+        var FragmentShader = Object.create(GLShader);
+        FragmentShader.Init(context,context.FRAGMENT_SHADER,document.getElementById("fshader").textContent);
+        FragmentShader.CompileShader();
+
+        myProgram.AddShader(VertexShader);
+        myProgram.AddShader(FragmentShader);
+
+        myProgram.LinkProgram();
+        myProgram.UseProgram();
+        /**** end 创建Program ****/
+        var program = myProgram.programId;
+
+
+
+
+        
+        
 
         /** start纹理坐标 **/
         var dataCoor = new Float32Array([0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]);
@@ -63,6 +87,10 @@
         context.enableVertexAttribArray(posCoorLocation);
         /** end纹理坐标 **/
 
+
+
+
+
         /** start设置定点数据 **/
         var data = new Float32Array([-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0]);
         var buffer = context.createBuffer();
@@ -75,6 +103,11 @@
         context.enableVertexAttribArray(posLocation);
         /** end设置定点数据 **/
 
+
+
+
+
+
         /** start设置索引数据 **/
         var indicesData = new Uint8Array([0, 1, 2, 0, 2, 3]);
         var indexBuffer = context.createBuffer();
@@ -85,25 +118,18 @@
 
         loadImage("girl2.jpg", function(img) {
             /** start贴图 **/
-            var texture = context.createTexture();
-            context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL,1);
-            context.activeTexture(context.TEXTURE0);
-            context.bindTexture(context.TEXTURE_2D,texture);
+            var GLTextureObj = Object.create(GLTexture);
+            GLTextureObj.Init(context);
+            GLTextureObj.SetImage(img,context.TEXTURE0);
+            var texture = GLTextureObj.textureId;
 
-            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_MIN_FILTER,context.LINEAR);
-            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_MAG_FILTER,context.LINEAR);
-            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_S,context.CLAMP_TO_EDGE);
-            context.texParameteri(context.TEXTURE_2D,context.TEXTURE_WRAP_T,context.CLAMP_TO_EDGE);
+            context.clearColor(0.0, 1.0, 1.0, 1.0);
+            context.clear(context.COLOR_BUFFER_BIT);
 
-            context.texImage2D(context.TEXTURE_2D,0,context.RGBA,context.RGBA,context.UNSIGNED_BYTE,img);
+            var texLocation = context.getUniformLocation(program, 'mainTexture');
+            context.uniform1i(texLocation, 0);
 
-            var texLocation = context.getUniformLocation(program,'mainTexture');
-            context.uniform1i(texLocation,0);
-
-            console.log(img.naturalWidth);
-            console.log(img.naturalHeight);
-
-            draw()
+            draw();
         });
         /** end贴图 **/
 
@@ -125,37 +151,13 @@
             context.drawElements(context.TRIANGLES, indicesData.length, context.UNSIGNED_BYTE, 0);
         }
 
-
-        function initShader(gl, vertexShaderSource, fragmentShaderSource) {
-            var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-            var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-
-            gl.shaderSource(vertexShader, vertexShaderSource);
-            gl.shaderSource(fragmentShader, fragmentShaderSource);
-
-            gl.compileShader(vertexShader);
-            gl.compileShader(fragmentShader);
-
-            var program = gl.createProgram();
-            gl.attachShader(program, vertexShader);
-            gl.attachShader(program, fragmentShader);
-
-            gl.linkProgram(program);
-
-            gl.useProgram(program);
-
-            console.error(gl.getShaderInfoLog(vertexShader));
-            console.error(gl.getShaderInfoLog(fragmentShader));
-
-            return program;
-        }
-
         function loadImage(url, cb) {
             var img = new Image();
+            img.crossOrigin = "Anonymous"
+            img.src = url;
             img.onload = function() {
                 cb(img);
             };
-            img.src = url;
         }
     </script>
 </body>

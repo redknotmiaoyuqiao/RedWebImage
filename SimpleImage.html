@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>SimpleImage</title>
+        <meta charset="utf-8"></meta>
+
+        <script src="lib/GL/GLProgram.js"></script>
+        <script src="lib/GL/GLShader.js"></script>
+        <script src="lib/GL/GLTexture.js"></script>
+        <script src="lib/GL/GLBuffer.js"></script>
+
+        <script src="lib/RWI/SimpleImage.js"></script>
+        <script src="lib/RWI/LoadImage.js"></script>
+        <script src="lib/RWI/Draw.js"></script>
+    </head>
+    <body>
+        <center>
+            <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
+        </center>
+        <script>
+            var simpleImage = Object.create(SimpleImage);
+            simpleImage.Init("webGL");
+            simpleImage.SetImageUrl("http://image.dcniupai.com/o_1bckbio6ebv9seca4gk6102qpg.jpg");
+        </script>
+    </body>
+</html>
