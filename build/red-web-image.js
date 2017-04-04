@@ -1,4 +1,4 @@
-/**** 创建时间为:2017-04-04 07:43:52 ****/
+/**** 创建时间为:2017-04-04 18:21:52 ****/
 
 
 /**** GLBuffer.js ****/
@@ -155,6 +155,7 @@ var Draw = {
 
     SetUniformTexture : function(name, texture){
         this.context.bindTexture(this.context.TEXTURE_2D, texture.textureId);
+        
         var texLocation = this.context.getUniformLocation(this.program.programId, name);
         this.context.uniform1i(texLocation, 0);
     },
@@ -173,6 +174,37 @@ var Draw = {
         this.context.clear(this.context.COLOR_BUFFER_BIT);
 
         this.context.drawElements(this.context.TRIANGLES, this.indexBuffer.data.length, this.context.UNSIGNED_BYTE, 0);
+    }
+};
+
+/**** Filter.js ****/
+
+var Filter = {
+
+    context : null,
+    name : null,
+    program : null,
+
+    Init : function(context,name){
+        var vertexShaderSource = eval("vertex_" + name);
+        var fragmentShaderSource = eval("fragment_" + name);
+
+        this.context = context;
+
+        this.program = Object.create(GLProgram);
+        this.program.Init(this.context);
+
+        var vertexShader = Object.create(GLShader);
+        vertexShader.Init(this.context,this.context.VERTEX_SHADER,vertex_wave);
+        vertexShader.CompileShader();
+        var fragmentShader = Object.create(GLShader);
+        fragmentShader.Init(this.context,this.context.FRAGMENT_SHADER,fragment_wave);
+        fragmentShader.CompileShader();
+
+        this.program.AddShader(vertexShader);
+        this.program.AddShader(fragmentShader);
+
+        this.program.LinkProgram();
     }
 };
 
@@ -207,29 +239,21 @@ var SimpleImage = {
 
     draw : null,
 
-    Init : function(canvasId){
+    filterName : null,
+
+    Init : function(canvasId,filterName){
         this.canvasId = canvasId;
+        this.filterName = filterName;
 
         var canvasElement = document.getElementById(this.canvasId);
         this.context = canvasElement.getContext('webgl' || 'experimental-webgl');
         
         /**
-         * 初始化Program
+         * 根据FilterName创建
          */
-        var program = Object.create(GLProgram);
-        program.Init(this.context);
-
-        vertexShader = Object.create(GLShader);
-        vertexShader.Init(this.context,this.context.VERTEX_SHADER,vertex_wave);
-        vertexShader.CompileShader();
-        fragmentShader = Object.create(GLShader);
-        fragmentShader.Init(this.context,this.context.FRAGMENT_SHADER,fragment_wave);
-        fragmentShader.CompileShader();
-
-        program.AddShader(vertexShader);
-        program.AddShader(fragmentShader);
-
-        program.LinkProgram();
+        var filter = Object.create(Filter);
+        filter.Init(this.context,filterName);
+        var program = filter.program;
 
         draw = Object.create(Draw);
         draw.Init(this.context,program);
