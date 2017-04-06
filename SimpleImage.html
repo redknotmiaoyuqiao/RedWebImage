@@ -6,14 +6,19 @@
         <script src="build/red-web-image.js"></script>
         <script src="build/red-web-shader-lib.js"></script>
     </head>
-    <body>
-        <center>
-            <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
-        </center>
+    <body>  
+        <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
+        <canvas id="webGL2" width="2000px" height="1500px" style="width:70%"></canvas>
+        <script>
+            var simpleImage2 = Object.create(SimpleImage);
+            simpleImage2.Init("webGL2","wave");
+            simpleImage2.SetImageUrl("docs/img/miaowu.jpg");
+        </script>
         <script>
             var simpleImage = Object.create(SimpleImage);
             simpleImage.Init("webGL","wave");
-            simpleImage.SetImageUrl("img/miaowu.jpg");
+            simpleImage.SetImageUrl("docs/img/girl2.jpg");
         </script>
+        
     </body>
 </html>

@@ -1,294 +1,160 @@
-/**** 创建时间为:2017-04-04 18:21:52 ****/
+/**** 创建时间为:2017-04-06 09:10:55 ****/
 
-
-/**** GLBuffer.js ****/
-
-var GLBuffer = {
-
-    context : null,
-    data : null,
-    bufferId : null,
-    bufferType : null,
-
-    size : 0,
-
-    Init : function(context){
-        this.context = context;
-        this.bufferId = this.context.createBuffer();
-    },
-
-    SetBufferData : function(data,bufferType,size){
-        this.data = data;
-        this.bufferType = bufferType;
-        this.size = size;
-        this.context.bindBuffer(this.bufferType, this.bufferId);
-        this.context.bufferData(this.bufferType, this.data, this.context.STATIC_DRAW);
-    }
-};
 
 /**** GLProgram.js ****/
 
+/**
+ * 封装了Program Redknot编写
+ */
 var GLProgram = {
-    programId : null,
-    context : null,
-    shaderList : new Array(),
 
-    Init : function(context){
-        this.context = context;
-        this.programId = this.context.createProgram();
+    glContext : null,
+    programId : null,
+    shaderList : null,
+
+    Init : function(glContext){
+        this.glContext = glContext;
+        this.programId = this.glContext.createProgram();
+        this.shaderList = new Array();
     },
 
     AddShader : function(shader){
-        this.shaderList.push(shader.shaderId);
+        this.shaderList.push(shader);
     },
 
     LinkProgram : function(){
         for(var i=0;i<this.shaderList.length;i++){
-            this.context.attachShader(this.programId, this.shaderList[i]);
+            this.glContext.attachShader(this.programId, this.shaderList[i].shaderId);
         }
-        this.context.linkProgram(this.programId);
+        this.glContext.linkProgram(this.programId);
     },
 
     UseProgram : function(){
-        this.context.useProgram(this.programId);
+        this.glContext.useProgram(this.programId);
     }
 };
 
 /**** GLShader.js ****/
 
+/**
+ * 封装了Shader Redknot编写
+ */
 var GLShader = {
 
-    shaderId : null,
-    context : null,
+    glContext : null,
+    type : null,
     source : null,
 
-    Init : function(context,shaderType){
-        this.context = context;
-        this.shaderId = this.context.createShader(shaderType);
-    },
+    shaderId : null,
 
-    Init : function(context,shaderType,source){
-        this.context = context;
-        this.shaderId = this.context.createShader(shaderType);
+    Init : function(glContext,type,source){
+        this.glContext = glContext,
+        this.type = type;
         this.source = source;
-        this.context.shaderSource(this.shaderId, this.source);
-    },
 
-    SetSourceByText : function(source){
-        this.source = source;
-        this.context.shaderSource(this.shaderId, this.source);
-    },
+        if (type == "vertex") {
+            this.type = this.glContext.VERTEX_SHADER;
+        } 
+        else if (type == "fragment") {
+            this.type = this.glContext.FRAGMENT_SHADER;
+        }
+        else {
+            return;
+        }
 
-    CompileShader : function(){
-         this.context.compileShader(this.shaderId);
-         var error = this.context.getShaderInfoLog(this.shaderId);
-         if(error != ""){
-             console.error(error);
-         }
-    }
-};
+        this.shaderId = this.glContext.createShader(this.type);
+        this.glContext.shaderSource(this.shaderId, this.source);
+        this.glContext.compileShader(this.shaderId);
 
-/**** GLTexture.js ****/
-
-var GLTexture = {
-    textureId : null,
-    context : null,
-    texUnit : null,
-
-    Init : function(context){
-        this.context = context;
-        this.textureId = this.context.createTexture();
-    },
-
-    SetImage : function(img,texUnit){
-        this.texUnit = texUnit;
-        
-        this.context.pixelStorei(this.context.UNPACK_FLIP_Y_WEBGL, 1);
-        this.context.activeTexture(texUnit);
-        this.context.bindTexture(this.context.TEXTURE_2D, this.textureId);
-
-        this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_MIN_FILTER, this.context.LINEAR);
-        this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_MAG_FILTER, this.context.LINEAR);
-        this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_WRAP_S, this.context.CLAMP_TO_EDGE);
-        this.context.texParameteri(this.context.TEXTURE_2D, this.context.TEXTURE_WRAP_T, this.context.CLAMP_TO_EDGE);
-
-        this.context.texImage2D(this.context.TEXTURE_2D, 0, this.context.RGBA, this.context.RGBA, this.context.UNSIGNED_BYTE, img);
+        var error = this.glContext.getShaderInfoLog(this.shaderId);
+        if(error != ""){
+            console.error(error);
+        }
     }
 };
 
 /**** Draw.js ****/
 
+/**
+ * 封装了一次绘制过程 Redknot编写
+ */
 var Draw = {
-    context : null,
+
+    glContext : null,
     program : null,
 
-    indexBuffer : null, 
-
-    backgroundR : 1.0,
-    backgroundG : 1.0,
-    backgroundB : 1.0,
-    backgroundA : 1.0,
-
-    Init : function(context,program){
-        this.context = context;
+    Init : function(glContext,program){
+        this.glContext = glContext;
         this.program = program;
-
-        this.program.UseProgram();
-
-        var indicesData = new Uint8Array([0, 1, 2, 0, 2, 3]);
-        this.indexBuffer = Object.create(GLBuffer);
-        this.indexBuffer.Init(this.context);
-        this.indexBuffer.SetBufferData(indicesData,this.context.ELEMENT_ARRAY_BUFFER);
     },
 
-    SetElementIndex : function(indexBuffer){
-        this.indexBuffer = indexBuffer;
+    /**
+     * 创建并绑定一个ARRAY_BUFFER
+     */
+    SetAttribute : function(name,data,size){
+        var buffer = this.glContext.createBuffer();
+        this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, buffer);
+        this.glContext.bufferData(this.glContext.ARRAY_BUFFER, data, this.glContext.STATIC_DRAW);
+
+        var Location = this.glContext.getAttribLocation(this.program.programId,name);
+        this.glContext.vertexAttribPointer(Location, size, this.glContext.FLOAT, false, 0, 0);
+        this.glContext.enableVertexAttribArray(Location);
     },
 
-    SetAttribute : function(name, buffer){
-        this.context.bindBuffer(buffer.bufferType, buffer.bufferId);
-
-        var Location = this.context.getAttribLocation(this.program.programId,name);
-        this.context.vertexAttribPointer(Location, buffer.size, this.context.FLOAT, false, 0, 0);
-        this.context.enableVertexAttribArray(Location);
-    },
-
-    SetUniformTexture : function(name, texture){
-        this.context.bindTexture(this.context.TEXTURE_2D, texture.textureId);
-        
-        var texLocation = this.context.getUniformLocation(this.program.programId, name);
-        this.context.uniform1i(texLocation, 0);
-    },
-
-    SetBackgroundColor : function(R,G,B,A){
-        this.backgroundR = R;
-        this.backgroundG = G;
-        this.backgroundB = B;
-        this.backgroundA = A;
-    },
-
-    DoDraw : function(){
-        this.program.UseProgram();
-
-        this.context.clearColor(this.backgroundR,this.backgroundG,this.backgroundB,this.backgroundA);
-        this.context.clear(this.context.COLOR_BUFFER_BIT);
-
-        this.context.drawElements(this.context.TRIANGLES, this.indexBuffer.data.length, this.context.UNSIGNED_BYTE, 0);
+    /**
+     * 设置绘制索引
+     */
+    SetElementIndex : function(data){
+        var buffer = this.glContext.createBuffer();
+        this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, buffer);
+        this.glContext.bufferData(this.glContext.ELEMENT_ARRAY_BUFFER, data, this.glContext.STATIC_DRAW);
     }
 };
 
-/**** Filter.js ****/
+/**** SimpleRwi.js ****/
 
-var Filter = {
-
-    context : null,
-    name : null,
-    program : null,
-
-    Init : function(context,name){
-        var vertexShaderSource = eval("vertex_" + name);
-        var fragmentShaderSource = eval("fragment_" + name);
-
-        this.context = context;
-
-        this.program = Object.create(GLProgram);
-        this.program.Init(this.context);
-
-        var vertexShader = Object.create(GLShader);
-        vertexShader.Init(this.context,this.context.VERTEX_SHADER,vertex_wave);
-        vertexShader.CompileShader();
-        var fragmentShader = Object.create(GLShader);
-        fragmentShader.Init(this.context,this.context.FRAGMENT_SHADER,fragment_wave);
-        fragmentShader.CompileShader();
-
-        this.program.AddShader(vertexShader);
-        this.program.AddShader(fragmentShader);
-
-        this.program.LinkProgram();
-    }
-};
-
-/**** LoadImage.js ****/
-
-var LoadImage = {
-
-    src : null,
-    context : null,
-
-    Load : function(src,object){
-        this.src = src;
-        
-        var img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.src = this.src;
-        img.onload = function() {
-            object.ImageCallBack(img);
-        };
-    }
-};
-
-/**** SimpleImage.js ****/
-
-/****
- * 单张图片，单次处理的简单Image
-****/
-var SimpleImage = {
+/**
+ * 封装了Program Redknot编写
+ */
+var SimpleRwi = {
 
     canvasId : null,
-    context : null,
+    FilterName : null,
 
-    draw : null,
+    glContext : null,
 
-    filterName : null,
-
-    Init : function(canvasId,filterName){
+    Init : function(canvasId,FilterName)
+    {
         this.canvasId = canvasId;
-        this.filterName = filterName;
+        this.FilterName = FilterName;
 
-        var canvasElement = document.getElementById(this.canvasId);
-        this.context = canvasElement.getContext('webgl' || 'experimental-webgl');
-        
-        /**
-         * 根据FilterName创建
-         */
-        var filter = Object.create(Filter);
-        filter.Init(this.context,filterName);
-        var program = filter.program;
+        var canvasElement = document.getElementById(canvasId);
+        this.glContext = canvasElement.getContext('webgl');
 
-        draw = Object.create(Draw);
-        draw.Init(this.context,program);
+        var vertex = Object.create(GLShader);
+        vertex.Init(this.glContext,"vertex",eval("vertex_" + FilterName));
+        var fragment = Object.create(GLShader);
+        fragment.Init(this.glContext,"fragment",eval("fragment_" + FilterName));
 
+        programV = Object.create(GLProgram);
+        programV.Init(this.glContext);
+        programV.AddShader(vertex);
+        programV.AddShader(fragment);
+        programV.LinkProgram();
+        programV.UseProgram();
 
-        /**** 创建顶点Buffer ****/
+        var draw = Object.create(Draw);
+        draw.Init(this.glContext,programV);
+
         var data = new Float32Array([-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0]);
-        var VertexBuffer = Object.create(GLBuffer);
-        VertexBuffer.Init(this.context);
-        VertexBuffer.SetBufferData(data,this.context.ARRAY_BUFFER,2);
-        draw.SetAttribute("pos",VertexBuffer);
+        draw.SetAttribute("pos",data,2);
 
-        /**** 纹理坐标Buffer ****/
-        var dataCoor = new Float32Array([0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]);
-        var CoorBuffer = Object.create(GLBuffer);
-        CoorBuffer.Init(this.context);
-        CoorBuffer.SetBufferData(dataCoor,this.context.ARRAY_BUFFER,2);
-        draw.SetAttribute("texPos",CoorBuffer);
-    },
+        var indicesData = new Uint8Array([0, 1, 2, 0, 2, 3]);
+        draw.SetElementIndex(indicesData);
 
-    SetImageUrl : function(imgUrl){
-        var imageLoad = Object.create(LoadImage);
-        imageLoad.Load(imgUrl,this);
-    },
+        this.glContext.clearColor(1.0,1.0,0.0,1.0);
+        this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
 
-    ImageCallBack : function(img){
-        /**** 构建mainTexture ****/
-        var texture = Object.create(GLTexture);
-        texture.Init(this.context);
-        texture.SetImage(img,this.context.TEXTURE0);
-
-        draw.SetUniformTexture("mainTexture",texture);
-
-        draw.SetBackgroundColor(1.0, 1.0, 0.0, 0.0);
-        draw.DoDraw();
+        this.glContext.drawElements(this.glContext.TRIANGLES, indicesData.length, this.glContext.UNSIGNED_BYTE, 0);
     }
-
 };

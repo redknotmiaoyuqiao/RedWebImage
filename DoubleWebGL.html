@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>多个Canvas</title>
+        <meta charset="utf-8"></meta>
+
+        <script src="build/red-web-shader-lib.js"></script>
+        <script src="build/red-web-image.js"></script>
+    </head>
+
+    <body>
+        <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
+        <br>
+        <canvas id="webGL2" width="2000px" height="1500px" style="width:70%"></canvas>
+
+        <script>
+            var image1 = Object.create(SimpleRwi);
+            image1.Init("webGL","wave");
+
+            var image2 = Object.create(SimpleRwi);
+            image1.Init("webGL2","text2");
+        </script>  
+    </body>
+</html>

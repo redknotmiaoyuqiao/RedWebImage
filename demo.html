@@ -11,9 +11,11 @@
 </head>
 
 <body>
-    <center>
-        <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
-    </center>
+
+    <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
+
+    <canvas id="webGL2" width="2000px" height="1500px" style="width:70%"></canvas>
+
     <script id="vshader" type="x-shader/x-vertex">
         attribute vec2 pos;
         attribute vec2 texPos;
@@ -37,12 +39,33 @@
         }
     </script>
     <script>
+        var canvasElement2 = document.getElementById("webGL2");
+        var context2 = canvasElement2.getContext('webgl' || 'experimental-webgl');
+
+        var myProgram2 = Object.create(GLProgram);
+        myProgram2.Init(context2);
+
+        var VertexShader2 = Object.create(GLShader);
+        VertexShader2.Init(context2,context2.VERTEX_SHADER,document.getElementById("vshader").textContent);
+        VertexShader2.CompileShader();
+
+        var FragmentShader2 = Object.create(GLShader);
+        FragmentShader2.Init(context2,context2.FRAGMENT_SHADER,document.getElementById("fshader").textContent);
+        FragmentShader2.CompileShader();
+
+        myProgram2.AddShader(VertexShader2);
+        myProgram2.AddShader(FragmentShader2);
+
+        myProgram2.LinkProgram();
+        myProgram2.UseProgram();
+
+        context2.clear(context2.COLOR_BUFFER_BIT);
+        context2.clearColor(1.0,1.0,0.0,1.0);
+        
+    </script>
+    <script>
         var canvasElement = document.getElementById("webGL");
         var context = canvasElement.getContext('webgl' || 'experimental-webgl');
-
-
-
-
 
         /**** start 创建Program ****/
         var myProgram = Object.create(GLProgram);
