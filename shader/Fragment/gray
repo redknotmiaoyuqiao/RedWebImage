@@ -1,0 +1,9 @@
+precision lowp float;
+varying vec2 varyTexPos;
+uniform sampler2D mainTexture;
+
+void main(){
+    vec4 rgb = texture2D(mainTexture, varyTexPos);
+    float gray = rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114;
+    gl_FragColor = vec4(gray, gray, gray, 1.0);
+}

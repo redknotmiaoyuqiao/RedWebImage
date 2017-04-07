@@ -1,4 +1,4 @@
-/**** 创建时间为:2017-04-07 20:25:50 ****/
+/**** 创建时间为:2017-04-08 03:21:12 ****/
 
 
 /**** GLProgram.js ****/
@@ -195,9 +195,8 @@ var ImageLoad = {
         img.crossOrigin = "Anonymous";
         img.src = url;
         img.onload = function() {
-            rwi.CallBack(img);
+            rwi.CallBack(img)
         };
-        console.log(rwi);
     }
 };
 
@@ -215,7 +214,7 @@ var SimpleRwi = {
 
     draw : null,
 
-    Init : function(canvasId,FilterName)
+    Init : function(canvasId,FilterName,imageSrc)
     {
         this.canvasId = canvasId;
         this.FilterName = FilterName;
@@ -235,54 +234,40 @@ var SimpleRwi = {
         programV.LinkProgram();
         programV.UseProgram();
 
-        draw = Object.create(Draw);
-        draw.Init(this.glContext,programV);
+        this.draw = Object.create(Draw);
+        this.draw.Init(this.glContext,programV);
 
         var data = new Float32Array([-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0]);
-        draw.SetAttribute("pos",data,2);
+        this.draw.SetAttribute("pos",data,2);
 
         var dataCoor = new Float32Array([0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]);
-        draw.SetAttribute("texPos",dataCoor,2);
+        this.draw.SetAttribute("texPos",dataCoor,2);
 
         var indicesData = new Uint8Array([0, 1, 2, 0, 2, 3]);
-        draw.SetElementIndex(indicesData);
+        this.draw.SetElementIndex(indicesData);
 
-        draw.SetClearColor(0.0,1.0,0.0,1.0);
+        this.draw.SetClearColor(0.0,1.0,0.0,1.0);
 
-
-        //var imageLoad = Object.create(ImageLoad);
-        //imageLoad.Init("http://image.dcniupai.com/o_1bcukhfu5vn0dsl1gnd1pcd1b5411m.jpg",this);
         /**
          * 创建贴图
          */
-        /*
-        var img = new Image();
-        img.crossOrigin = "Anonymous";
-    
-        console.log(this);
-        img.onload = function(){
-            console.log(this);
-        }
 
-        img.src = "http://image.dcniupai.com/o_1bcukhfu5vn0dsl1gnd1pcd1b5411m.jpg";
-
-        var texture = Object.create(GLTexture);
-        texture.Init(this.glContext, img, this.glContext.TEXTURE0);
-
-        draw.SetUniformTexture("mainTexture",texture ,0);
-        draw.DoDraw();
-        */
-
-        var img = Object.create(ImageLoad);
-        img.Init("http://image.dcniupai.com/o_1bcukhfu5vn0dsl1gnd1pcd1b5411m.jpg",this);
-        
+        var imageload = Object.create(ImageLoad);
+        ImageLoad.Init(imageSrc,this);
+     
     },
 
-    CallBack : function(img){
+    CallBack: function (img) {
         var texture = Object.create(GLTexture);
         texture.Init(this.glContext, img, this.glContext.TEXTURE0);
+        
+        this.draw.SetUniformTexture("mainTexture", texture, 0);
+        this.draw.DoDraw();
 
-        draw.SetUniformTexture("mainTexture",texture ,0);
-        draw.DoDraw();
+        this.OnLoadImage();
+    },
+
+    OnLoadImage : function(){
+
     }
 };

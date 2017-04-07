@@ -6,20 +6,38 @@
         <script src="build/red-web-image.js"></script>
         <script src="build/red-web-shader-lib.js"></script>
     </head>
-    <body>
+    <body>  
         <center>
-            <h1>There is RWI (Red Web Image) Demo</h1>
+            <h1>Red Web Image (RWI,基于 WebGL 的 &ltimg /&gt )</h1>
+            <h3>这是一个比较上得了台面的版本了</h3>
         </center>
         <center>
-            <h2>来，看这里～～～～</h2>
+            <h4>原图</h4>
+            <img src="img/miaowu.jpg" style="width:50%"></img>
+
+            <h4>扭曲</h4>
+            <canvas id="wave" width="2000px" height="1500px" style="width:50%"></canvas>
+            <script>
+                var img_src = "img/miaowu.jpg";
+
+                var image_wave = Object.create(SimpleRwi);
+                image_wave.Init("wave","wave",img_src);
+            </script>
+
+            <h4>灰度</h4>
+            <canvas id="image_gray" width="2000px" height="1500px" style="width:50%"></canvas>
+            <script>
+                var image_gray = Object.create(SimpleRwi);
+                image_gray.Init("image_gray","gray",img_src);
+            </script>
+
+            <h4>反色</h4>
+            <canvas id="image_inverse" width="2000px" height="1500px" style="width:50%"></canvas>
+            <script>
+                var image_inverse = Object.create(SimpleRwi);
+                image_inverse.Init("image_inverse","inverse",img_src);
+            </script>
+            
         </center>
-        <center>
-            <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
-        </center>
-        <script>
-            var simpleImage = Object.create(SimpleImage);
-            simpleImage.Init("webGL");
-            simpleImage.SetImageUrl("img/miaowu.jpg");
-        </script>
     </body>
 </html>
