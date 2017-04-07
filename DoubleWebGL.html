@@ -8,16 +8,23 @@
     </head>
 
     <body>
-        <canvas id="webGL" width="2000px" height="1500px" style="width:70%"></canvas>
+        <canvas id="webGL" width="2000px" height="1500px" style="width:50%"></canvas>
         <br>
-        <canvas id="webGL2" width="2000px" height="1500px" style="width:70%"></canvas>
+        <br>
+        <canvas id="webGL2" width="2000px" height="1500px" style="width:50%"></canvas>
+        <br>
+        <br>
+        <canvas id="webGL3" width="2000px" height="1500px" style="width:50%"></canvas>
 
         <script>
             var image1 = Object.create(SimpleRwi);
             image1.Init("webGL","wave");
 
             var image2 = Object.create(SimpleRwi);
-            image1.Init("webGL2","text2");
+            image2.Init("webGL2","wave");
+
+            var image3 = Object.create(SimpleRwi);
+            image3.Init("webGL3","wave");
         </script>  
     </body>
 </html>

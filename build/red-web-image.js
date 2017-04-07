@@ -1,4 +1,4 @@
-/**** 创建时间为:2017-04-06 09:10:55 ****/
+/**** 创建时间为:2017-04-07 20:25:50 ****/
 
 
 /**** GLProgram.js ****/
@@ -12,16 +12,25 @@ var GLProgram = {
     programId : null,
     shaderList : null,
 
+    /**
+     * 初始化
+     */
     Init : function(glContext){
         this.glContext = glContext;
         this.programId = this.glContext.createProgram();
         this.shaderList = new Array();
     },
 
+    /**
+     * 添加一个Shader
+     */
     AddShader : function(shader){
         this.shaderList.push(shader);
     },
 
+    /**
+     * 编译shander
+     */
     LinkProgram : function(){
         for(var i=0;i<this.shaderList.length;i++){
             this.glContext.attachShader(this.programId, this.shaderList[i].shaderId);
@@ -29,6 +38,9 @@ var GLProgram = {
         this.glContext.linkProgram(this.programId);
     },
 
+    /**
+     * 将此Program设置为当前
+     */
     UseProgram : function(){
         this.glContext.useProgram(this.programId);
     }
@@ -73,6 +85,32 @@ var GLShader = {
     }
 };
 
+/**** GLTexture.js ****/
+
+var GLTexture = {
+
+    glContext : null,
+    textureId : null,
+
+    Init : function(glContext,img,texUnit){
+        this.glContext = glContext;
+
+        this.textureId = this.glContext.createTexture();
+
+        this.glContext.pixelStorei(this.glContext.UNPACK_FLIP_Y_WEBGL, 1);
+        this.glContext.activeTexture(texUnit);
+        this.glContext.bindTexture(this.glContext.TEXTURE_2D, this.textureId);
+
+        this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_MIN_FILTER, this.glContext.LINEAR);
+        this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_MAG_FILTER, this.glContext.LINEAR);
+        this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_WRAP_S, this.glContext.CLAMP_TO_EDGE);
+        this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_WRAP_T, this.glContext.CLAMP_TO_EDGE);
+
+        this.glContext.texImage2D(this.glContext.TEXTURE_2D, 0, this.glContext.RGBA, this.glContext.RGBA, this.glContext.UNSIGNED_BYTE, img);
+    } 
+    
+};
+
 /**** Draw.js ****/
 
 /**
@@ -82,6 +120,12 @@ var Draw = {
 
     glContext : null,
     program : null,
+    indicesData : null,
+
+    R : 1.0,
+    G : 1.0,
+    B : 1.0,
+    A : 1.0,
 
     Init : function(glContext,program){
         this.glContext = glContext;
@@ -105,9 +149,55 @@ var Draw = {
      * 设置绘制索引
      */
     SetElementIndex : function(data){
+        this.indicesData = data;
         var buffer = this.glContext.createBuffer();
         this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, buffer);
         this.glContext.bufferData(this.glContext.ELEMENT_ARRAY_BUFFER, data, this.glContext.STATIC_DRAW);
+    },
+
+    /**
+     * 设置Texture
+     */
+    SetUniformTexture : function(name, texture, texUnit){
+        this.glContext.bindTexture(this.glContext.TEXTURE_2D, texture.textureId);
+        
+        var texLocation = this.glContext.getUniformLocation(this.program.programId, name);
+        this.glContext.uniform1i(texLocation, texUnit);
+    },
+
+    /**
+     * 设置清屏颜色
+     */
+    SetClearColor : function(R,G,B,A){
+        this.R = R;
+        this.G = G;
+        this.B = B;
+        this.A = A;
+    },
+
+    /**
+     * 提交一次绘制
+     */
+    DoDraw : function(){
+        this.glContext.clearColor(this.R, this.G, this.B, this.A);
+        this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
+
+        this.glContext.drawElements(this.glContext.TRIANGLES, this.indicesData.length, this.glContext.UNSIGNED_BYTE, 0);
+    }
+};
+
+/**** ImageLoad.js ****/
+
+var ImageLoad = {
+    url : null,
+    Init : function (url,rwi){
+        var img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = url;
+        img.onload = function() {
+            rwi.CallBack(img);
+        };
+        console.log(rwi);
     }
 };
 
@@ -122,6 +212,8 @@ var SimpleRwi = {
     FilterName : null,
 
     glContext : null,
+
+    draw : null,
 
     Init : function(canvasId,FilterName)
     {
@@ -143,18 +235,54 @@ var SimpleRwi = {
         programV.LinkProgram();
         programV.UseProgram();
 
-        var draw = Object.create(Draw);
+        draw = Object.create(Draw);
         draw.Init(this.glContext,programV);
 
         var data = new Float32Array([-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0]);
         draw.SetAttribute("pos",data,2);
 
+        var dataCoor = new Float32Array([0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]);
+        draw.SetAttribute("texPos",dataCoor,2);
+
         var indicesData = new Uint8Array([0, 1, 2, 0, 2, 3]);
         draw.SetElementIndex(indicesData);
 
-        this.glContext.clearColor(1.0,1.0,0.0,1.0);
-        this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
+        draw.SetClearColor(0.0,1.0,0.0,1.0);
 
-        this.glContext.drawElements(this.glContext.TRIANGLES, indicesData.length, this.glContext.UNSIGNED_BYTE, 0);
+
+        //var imageLoad = Object.create(ImageLoad);
+        //imageLoad.Init("http://image.dcniupai.com/o_1bcukhfu5vn0dsl1gnd1pcd1b5411m.jpg",this);
+        /**
+         * 创建贴图
+         */
+        /*
+        var img = new Image();
+        img.crossOrigin = "Anonymous";
+    
+        console.log(this);
+        img.onload = function(){
+            console.log(this);
+        }
+
+        img.src = "http://image.dcniupai.com/o_1bcukhfu5vn0dsl1gnd1pcd1b5411m.jpg";
+
+        var texture = Object.create(GLTexture);
+        texture.Init(this.glContext, img, this.glContext.TEXTURE0);
+
+        draw.SetUniformTexture("mainTexture",texture ,0);
+        draw.DoDraw();
+        */
+
+        var img = Object.create(ImageLoad);
+        img.Init("http://image.dcniupai.com/o_1bcukhfu5vn0dsl1gnd1pcd1b5411m.jpg",this);
+        
+    },
+
+    CallBack : function(img){
+        var texture = Object.create(GLTexture);
+        texture.Init(this.glContext, img, this.glContext.TEXTURE0);
+
+        draw.SetUniformTexture("mainTexture",texture ,0);
+        draw.DoDraw();
     }
 };
