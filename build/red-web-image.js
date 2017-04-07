@@ -1,4 +1,4 @@
-/**** 创建时间为:2017-04-08 03:21:12 ****/
+/**** 创建时间为:2017-04-08 04:29:57 ****/
 
 
 /**** GLProgram.js ****/
@@ -59,6 +59,9 @@ var GLShader = {
 
     shaderId : null,
 
+    /**
+     * Shader 的编译链接
+     */
     Init : function(glContext,type,source){
         this.glContext = glContext,
         this.type = type;
@@ -92,6 +95,9 @@ var GLTexture = {
     glContext : null,
     textureId : null,
 
+    /**
+     * 构建Texture
+     */
     Init : function(glContext,img,texUnit){
         this.glContext = glContext;
 
@@ -246,15 +252,12 @@ var SimpleRwi = {
         var indicesData = new Uint8Array([0, 1, 2, 0, 2, 3]);
         this.draw.SetElementIndex(indicesData);
 
-        this.draw.SetClearColor(0.0,1.0,0.0,1.0);
-
         /**
          * 创建贴图
          */
 
         var imageload = Object.create(ImageLoad);
         ImageLoad.Init(imageSrc,this);
-     
     },
 
     CallBack: function (img) {
