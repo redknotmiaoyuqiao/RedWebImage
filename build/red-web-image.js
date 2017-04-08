@@ -1,4 +1,4 @@
-/**** 创建时间为:2017-04-08 17:57:56 ****/
+/**** 创建时间为:2017-04-09 05:01:47 ****/
 
 
 /**** GLProgram.js ****/
@@ -149,6 +149,14 @@ var Draw = {
         var Location = this.glContext.getAttribLocation(this.program.programId,name);
         this.glContext.vertexAttribPointer(Location, size, this.glContext.FLOAT, false, 0, 0);
         this.glContext.enableVertexAttribArray(Location);
+    },
+
+    /**
+     * 设置Float
+     */
+    SetUniformFloat : function(name,data){
+        var floatLocation = this.glContext.getUniformLocation(this.program.programId, name);
+        this.glContext.uniform1f(floatLocation, data);
     },
 
     /**
