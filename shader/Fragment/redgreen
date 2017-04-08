@@ -1,0 +1,14 @@
+precision lowp float;
+varying vec2 varyTexPos;
+uniform sampler2D mainTexture;
+
+void main(){
+    mat4 redgreen = mat4(
+                    0.0, 1.0, 0.0, 0.0,
+                    1.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 1.0, 0.0,
+                    0.0, 0.0, 0.0, 1.0
+                    );
+    vec4 rgb = texture2D(mainTexture, varyTexPos);
+    gl_FragColor = rgb * redgreen;
+}

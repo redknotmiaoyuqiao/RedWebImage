@@ -3,11 +3,11 @@ varying vec2 varyTexPos;
 uniform sampler2D mainTexture;
 
 void main(){
-    mat4 gray = mat4(
-                    0.3, 0.6, 0.1, 0.0,
-                    0.3, 0.6, 0.1, 0.0,
-                    0.3, 0.6, 0.1, 0.0,
+    mat4 brown = mat4(
+                    0.5, 0.4, 0.2, 0.0,
+                    0.4, 0.3, 0.2, 0.0,
+                    0.4, 0.3, 0.2, 0.0,
                     0.0, 0.0, 0.0, 1.0);
     vec4 rgb = texture2D(mainTexture, varyTexPos);
-    gl_FragColor = rgb * gray;
+    gl_FragColor = rgb * brown;
 }
