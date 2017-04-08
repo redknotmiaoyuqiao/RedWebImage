@@ -41,8 +41,6 @@
             <h4>失焦动画</h4>
             <canvas id="aberration_animation" width="2000px" height="1500px" style="width:50%"></canvas>
             <script>
-                var img_src = "docs/img/miaowu.jpg";
-
                 var image_aberration_animation = Object.create(SimpleRwi);
                 image_aberration_animation.Init("aberration_animation","aberration",img_src);
                 image_aberration_animation.OnLoadImage = function(){
