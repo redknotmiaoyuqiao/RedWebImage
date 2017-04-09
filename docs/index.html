@@ -27,7 +27,7 @@
                 var image_wave_animation = Object.create(SimpleRwi);
                 image_wave_animation.Init("wave_animation","wave",img_src);
                 image_wave_animation.OnLoadImage = function(){
-                    setInterval(wave_call,30);
+                    setInterval(wave_call,50);
                 }
 
                 var floatVal = 0.0;
@@ -44,7 +44,7 @@
                 var image_aberration_animation = Object.create(SimpleRwi);
                 image_aberration_animation.Init("aberration_animation","aberration",img_src);
                 image_aberration_animation.OnLoadImage = function(){
-                    setInterval(aberration_animation_call,30);
+                    setInterval(aberration_animation_call,50);
                 }
 
                 var iGlobalTime = 0.0;
