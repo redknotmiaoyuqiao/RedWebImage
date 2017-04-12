@@ -1,10 +1,10 @@
-/**** 创建时间为:2017-04-09 09:23:43 ****/
+/**** 创建时间为:2017-04-12 23:37:40 ****/
 
 
 /**** GLProgram.js ****/
 
 /**
- * 封装了Program Redknot编写
+ * 灏佽浜哖rogram Redknot缂栧啓
  */
 var GLProgram = {
 
@@ -13,7 +13,7 @@ var GLProgram = {
     shaderList : null,
 
     /**
-     * 初始化
+     * 鍒濆鍖�
      */
     Init : function(glContext){
         this.glContext = glContext;
@@ -22,14 +22,14 @@ var GLProgram = {
     },
 
     /**
-     * 添加一个Shader
+     * 娣诲姞涓�涓猄hader
      */
     AddShader : function(shader){
         this.shaderList.push(shader);
     },
 
     /**
-     * 编译shander
+     * 缂栬瘧shander
      */
     LinkProgram : function(){
         for(var i=0;i<this.shaderList.length;i++){
@@ -39,7 +39,7 @@ var GLProgram = {
     },
 
     /**
-     * 将此Program设置为当前
+     * 灏嗘Program璁剧疆涓哄綋鍓�
      */
     UseProgram : function(){
         this.glContext.useProgram(this.programId);
@@ -49,7 +49,7 @@ var GLProgram = {
 /**** GLShader.js ****/
 
 /**
- * 封装了Shader Redknot编写
+ * 灏佽浜哠hader Redknot缂栧啓
  */
 var GLShader = {
 
@@ -60,7 +60,7 @@ var GLShader = {
     shaderId : null,
 
     /**
-     * Shader 的编译链接
+     * Shader 鐨勭紪璇戦摼鎺�
      */
     Init : function(glContext,type,source){
         this.glContext = glContext,
@@ -96,7 +96,7 @@ var GLTexture = {
     textureId : null,
 
     /**
-     * 构建Texture
+     * 鏋勫缓Texture
      */
     Init : function(glContext,img,texUnit){
         this.glContext = glContext;
@@ -120,7 +120,7 @@ var GLTexture = {
 /**** Draw.js ****/
 
 /**
- * 封装了一次绘制过程 Redknot编写
+ * 灏佽浜嗕竴娆＄粯鍒惰繃绋� Redknot缂栧啓
  */
 var Draw = {
 
@@ -139,7 +139,7 @@ var Draw = {
     },
 
     /**
-     * 创建并绑定一个ARRAY_BUFFER
+     * 鍒涘缓骞剁粦瀹氫竴涓狝RRAY_BUFFER
      */
     SetAttribute : function(name,data,size){
         var buffer = this.glContext.createBuffer();
@@ -152,7 +152,7 @@ var Draw = {
     },
 
     /**
-     * 设置Float
+     * 璁剧疆Float
      */
     SetUniformFloat : function(name,data){
         var floatLocation = this.glContext.getUniformLocation(this.program.programId, name);
@@ -160,7 +160,7 @@ var Draw = {
     },
 
     /**
-     * 设置绘制索引
+     * 璁剧疆缁樺埗绱㈠紩
      */
     SetElementIndex : function(data){
         this.indicesData = data;
@@ -170,7 +170,7 @@ var Draw = {
     },
 
     /**
-     * 设置Texture
+     * 璁剧疆Texture
      */
     SetUniformTexture : function(name, texture, texUnit){
         this.glContext.bindTexture(this.glContext.TEXTURE_2D, texture.textureId);
@@ -180,7 +180,7 @@ var Draw = {
     },
 
     /**
-     * 设置清屏颜色
+     * 璁剧疆娓呭睆棰滆壊
      */
     SetClearColor : function(R,G,B,A){
         this.R = R;
@@ -190,7 +190,7 @@ var Draw = {
     },
 
     /**
-     * 提交一次绘制
+     * 鎻愪氦涓�娆＄粯鍒�
      */
     DoDraw : function(){
         this.glContext.clearColor(this.R, this.G, this.B, this.A);
@@ -214,10 +214,49 @@ var ImageLoad = {
     }
 };
 
+/**** ShaderToyRwi.js ****/
+
+var ShaderToyRwi = {
+
+    canvasId : null,
+    FilterName : null,
+
+    glContext : null,
+
+    draw : null,
+
+    Init : function(canvasId,FilterName){
+        this.canvasId = canvasId;
+        this.FilterName = FilterName;
+
+        var canvasElement = document.getElementById(canvasId);
+        this.glContext = canvasElement.getContext("experimental-webgl") || canvasElement.getContext("experimental-webgl");
+
+        var vertex = Object.create(GLShader);
+        vertex.Init(this.glContext,"vertex",eval("vertex_" + FilterName));
+        var fragment = Object.create(GLShader);
+        fragment.Init(this.glContext,"fragment",eval("fragment_" + FilterName));
+
+        programV = Object.create(GLProgram);
+        programV.Init(this.glContext);
+        programV.AddShader(vertex);
+        programV.AddShader(fragment);
+        programV.LinkProgram();
+        programV.UseProgram();
+
+
+        this.draw = Object.create(Draw);
+        this.draw.Init(this.glContext,programV);
+
+
+        
+    }
+};
+
 /**** SimpleRwi.js ****/
 
 /**
- * 封装了Program Redknot编写
+ * 灏佽浜哖rogram Redknot缂栧啓
  */
 var SimpleRwi = {
 
@@ -234,7 +273,7 @@ var SimpleRwi = {
         this.FilterName = FilterName;
 
         var canvasElement = document.getElementById(canvasId);
-        this.glContext = canvasElement.getContext('webgl');
+        this.glContext = canvasElement.getContext("experimental-webgl") || canvasElement.getContext("experimental-webgl");
 
         var vertex = Object.create(GLShader);
         vertex.Init(this.glContext,"vertex",eval("vertex_" + FilterName));
@@ -261,7 +300,7 @@ var SimpleRwi = {
         this.draw.SetElementIndex(indicesData);
 
         /**
-         * 创建贴图
+         * 鍒涘缓璐村浘
          */
 
         var imageload = Object.create(ImageLoad);
