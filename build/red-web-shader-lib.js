@@ -1,4 +1,4 @@
-/**** 创建时间为:2017-04-12 23:37:40 ****/
+/**** 创建时间为:2017-04-13 03:51:56 ****/
 
 /**** Vertex ****/
 var vertex_aberration = "attribute vec2 pos;attribute vec2 texPos;varying vec2 varyTexPos;void main(){    gl_Position = vec4(pos.xy,0.0,1.0);    varyTexPos = texPos;}";
@@ -10,6 +10,7 @@ var vertex_gray = "attribute vec2 pos;attribute vec2 texPos;varying vec2 varyTex
 var vertex_inverse = "attribute vec2 pos;attribute vec2 texPos;varying vec2 varyTexPos;void main(){    gl_Position = vec4(pos.xy,0.0,1.0);    varyTexPos = texPos;}";
 var vertex_polygonization = "";
 var vertex_redgreen = "attribute vec2 pos;attribute vec2 texPos;varying vec2 varyTexPos;void main(){    gl_Position = vec4(pos.xy,0.0,1.0);    varyTexPos = texPos;}";
+var vertex_shaderToy = "attribute vec2 pos;attribute vec2 texPos;varying vec2 fragCoord;void main(){    gl_Position = vec4(pos.xy,0.0,1.0);    fragCoord = texPos;}";
 var vertex_water = "";
 var vertex_wave = "attribute vec2 pos;attribute vec2 texPos;varying vec2 varyTexPos;void main(){    gl_Position = vec4(pos.xy,0.0,1.0);    varyTexPos = texPos;}";
 /**** Vertex ****/
@@ -24,6 +25,7 @@ var fragment_gray = "precision lowp float;varying vec2 varyTexPos;uniform sample
 var fragment_inverse = "precision lowp float;varying vec2 varyTexPos;uniform sampler2D mainTexture;void main(){    vec4 rgb = texture2D(mainTexture, varyTexPos);    vec4 colorOut = vec4(1.0 - rgb.r, 1.0 - rgb.g, 1.0 - rgb.b, 1.0);    gl_FragColor = colorOut;}";
 var fragment_polygonization = "";
 var fragment_redgreen = "precision lowp float;varying vec2 varyTexPos;uniform sampler2D mainTexture;void main(){    mat4 redgreen = mat4(                    0.0, 1.0, 0.0, 0.0,                    1.0, 0.0, 0.0, 0.0,                    0.0, 0.0, 1.0, 0.0,                    0.0, 0.0, 0.0, 1.0                    );    vec4 rgb = texture2D(mainTexture, varyTexPos);    gl_FragColor = rgb * redgreen;}";
+var fragment_shaderToy = "precision highp float;varying vec2 fragCoord;uniform vec3 iResolution;uniform float iGlobalTime;uniform sampler2D iChannel0;float SCurve (float x) {    x = x * 2.0 - 1.0;    return -x * abs(x) * 0.5 + x + 0.5;}vec4 BlurH (sampler2D source, vec2 size, vec2 uv, float radius) {	if (radius >= 1.0)	{		vec4 A = vec4(0.0); 		vec4 C = vec4(0.0); 		float width = 1.0 / size.x;		float divisor = 0.0;         float weight = 0.0;                float radiusMultiplier = 1.0 / radius;       		for (float x = -20.0; x <= 20.0; x++)		{			A = texture2D(source, uv + vec2(x * width, 0.0));                        weight = SCurve(1.0 - (abs(x) * radiusMultiplier));                         C += A * weight;             			divisor += weight; 		}		return vec4(C.r / divisor, C.g / divisor, C.b / divisor, 1.0);	}	return texture2D(source, uv);}void mainImage( out vec4 fragColor, in vec2 fragCoord ){    vec2 uv;    uv.x = iResolution.x * fragCoord.x / iResolution.x;    uv.y = iResolution.y * fragCoord.y / iResolution.y;	fragColor = BlurH(iChannel0, iResolution.xy, uv, 20.0);}void main(){    mainImage(gl_FragColor,fragCoord);}";
 var fragment_water = "";
 var fragment_wave = "precision lowp float;varying vec2 varyTexPos;uniform sampler2D mainTexture;uniform float floatVal;void main(){    float stongth = 0.5;    vec2 uv = varyTexPos.xy;    float waveu = sin((uv.y + floatVal) * 20.0) * 0.5 * 0.05 * stongth;    gl_FragColor = texture2D(mainTexture, uv + vec2(waveu, 0.0));}";
 /**** Fragment ****/

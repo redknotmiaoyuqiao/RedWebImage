@@ -1,10 +1,28 @@
-/**** 创建时间为:2017-04-12 23:37:40 ****/
+/**** 创建时间为:2017-04-13 03:51:56 ****/
 
+
+/**** GLContext.js ****/
+
+/**
+ * 封装了 OpenGL 的 Context
+ */
+
+var GLContext = {
+
+    glContext : null,
+    docCanvas : null,
+
+    Init : function(canvasId){
+        this.docCanvas = document.getElementById(canvasId);
+
+        this.glContext = this.docCanvas.getContext("experimental-webgl") || this.docCanvas.getContext("experimental-webgl");
+    }
+};
 
 /**** GLProgram.js ****/
 
 /**
- * 灏佽浜哖rogram Redknot缂栧啓
+ * 封装了Program Redknot编写
  */
 var GLProgram = {
 
@@ -13,7 +31,7 @@ var GLProgram = {
     shaderList : null,
 
     /**
-     * 鍒濆鍖�
+     * 初始化
      */
     Init : function(glContext){
         this.glContext = glContext;
@@ -22,14 +40,14 @@ var GLProgram = {
     },
 
     /**
-     * 娣诲姞涓�涓猄hader
+     * 添加一个Shader
      */
     AddShader : function(shader){
         this.shaderList.push(shader);
     },
 
     /**
-     * 缂栬瘧shander
+     * 编译shander
      */
     LinkProgram : function(){
         for(var i=0;i<this.shaderList.length;i++){
@@ -39,7 +57,7 @@ var GLProgram = {
     },
 
     /**
-     * 灏嗘Program璁剧疆涓哄綋鍓�
+     * 将此Program设置为当前
      */
     UseProgram : function(){
         this.glContext.useProgram(this.programId);
@@ -49,7 +67,7 @@ var GLProgram = {
 /**** GLShader.js ****/
 
 /**
- * 灏佽浜哠hader Redknot缂栧啓
+ * 封装了Shader Redknot编写
  */
 var GLShader = {
 
@@ -60,7 +78,7 @@ var GLShader = {
     shaderId : null,
 
     /**
-     * Shader 鐨勭紪璇戦摼鎺�
+     * Shader 的编译链接
      */
     Init : function(glContext,type,source){
         this.glContext = glContext,
@@ -96,7 +114,7 @@ var GLTexture = {
     textureId : null,
 
     /**
-     * 鏋勫缓Texture
+     * 构建Texture
      */
     Init : function(glContext,img,texUnit){
         this.glContext = glContext;
@@ -104,7 +122,7 @@ var GLTexture = {
         this.textureId = this.glContext.createTexture();
 
         this.glContext.pixelStorei(this.glContext.UNPACK_FLIP_Y_WEBGL, 1);
-        this.glContext.activeTexture(texUnit);
+        this.glContext.activeTexture(this.GetTextureUnit(texUnit));
         this.glContext.bindTexture(this.glContext.TEXTURE_2D, this.textureId);
 
         this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_MIN_FILTER, this.glContext.LINEAR);
@@ -113,14 +131,20 @@ var GLTexture = {
         this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_WRAP_T, this.glContext.CLAMP_TO_EDGE);
 
         this.glContext.texImage2D(this.glContext.TEXTURE_2D, 0, this.glContext.RGBA, this.glContext.RGBA, this.glContext.UNSIGNED_BYTE, img);
-    } 
-    
+    },
+
+    /**
+     * 获取纹理单元
+     */
+    GetTextureUnit : function(input){
+        return 0x84C0 + input;
+    }
 };
 
 /**** Draw.js ****/
 
 /**
- * 灏佽浜嗕竴娆＄粯鍒惰繃绋� Redknot缂栧啓
+ * 封装了一次绘制过程 Redknot编写
  */
 var Draw = {
 
@@ -139,7 +163,7 @@ var Draw = {
     },
 
     /**
-     * 鍒涘缓骞剁粦瀹氫竴涓狝RRAY_BUFFER
+     * 创建并绑定一个ARRAY_BUFFER
      */
     SetAttribute : function(name,data,size){
         var buffer = this.glContext.createBuffer();
@@ -152,7 +176,7 @@ var Draw = {
     },
 
     /**
-     * 璁剧疆Float
+     * 设置Float
      */
     SetUniformFloat : function(name,data){
         var floatLocation = this.glContext.getUniformLocation(this.program.programId, name);
@@ -160,7 +184,15 @@ var Draw = {
     },
 
     /**
-     * 璁剧疆缁樺埗绱㈠紩
+     * 设置Vec3
+     */
+    SetUniformVec3 : function(name,data){
+        var vec3Location = this.glContext.getUniformLocation(this.program.programId, name);
+        this.glContext.uniform3fv(vec3Location, data);
+    },
+
+    /**
+     * 设置绘制索引
      */
     SetElementIndex : function(data){
         this.indicesData = data;
@@ -170,7 +202,7 @@ var Draw = {
     },
 
     /**
-     * 璁剧疆Texture
+     * 设置Texture
      */
     SetUniformTexture : function(name, texture, texUnit){
         this.glContext.bindTexture(this.glContext.TEXTURE_2D, texture.textureId);
@@ -180,7 +212,7 @@ var Draw = {
     },
 
     /**
-     * 璁剧疆娓呭睆棰滆壊
+     * 设置清屏颜色
      */
     SetClearColor : function(R,G,B,A){
         this.R = R;
@@ -190,7 +222,7 @@ var Draw = {
     },
 
     /**
-     * 鎻愪氦涓�娆＄粯鍒�
+     * 提交一次绘制
      */
     DoDraw : function(){
         this.glContext.clearColor(this.R, this.G, this.B, this.A);
@@ -204,17 +236,21 @@ var Draw = {
 
 var ImageLoad = {
     url : null,
-    Init : function (url,rwi){
+    Init : function (url,name,unit,rwi){
         var img = new Image();
         img.crossOrigin = "Anonymous";
         img.src = url;
         img.onload = function() {
-            rwi.CallBack(img)
+            rwi.ImgLoadCallBack(name,unit,img)
         };
     }
 };
 
 /**** ShaderToyRwi.js ****/
+
+/**
+ * 事实上，这是一个很有趣的类，你可以用它来轻松移植shaderToy上的shader
+ */
 
 var ShaderToyRwi = {
 
@@ -225,12 +261,15 @@ var ShaderToyRwi = {
 
     draw : null,
 
+    START_TIME : 0,
+
     Init : function(canvasId,FilterName){
         this.canvasId = canvasId;
         this.FilterName = FilterName;
 
-        var canvasElement = document.getElementById(canvasId);
-        this.glContext = canvasElement.getContext("experimental-webgl") || canvasElement.getContext("experimental-webgl");
+        var glContextD = Object.create(GLContext);
+        glContextD.Init(canvasId);
+        this.glContext = glContextD.glContext;
 
         var vertex = Object.create(GLShader);
         vertex.Init(this.glContext,"vertex",eval("vertex_" + FilterName));
@@ -245,18 +284,63 @@ var ShaderToyRwi = {
         programV.UseProgram();
 
 
+
+
         this.draw = Object.create(Draw);
         this.draw.Init(this.glContext,programV);
-
-
         
+        /**
+         * 设置顶点
+         */
+        var data = new Float32Array([-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0]);
+        this.draw.SetAttribute("pos",data,2);
+
+        /**
+         * 设置默认纹理坐标
+         */
+        var dataCoor = new Float32Array([0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]);
+        this.draw.SetAttribute("texPos",dataCoor,2);
+
+        /**
+         * 设置顶点索引
+         */
+        var indicesData = new Uint8Array([0, 1, 2, 0, 2, 3]);
+        this.draw.SetElementIndex(indicesData);
+
+        /**
+         * 设置Canvas实际大小
+         */
+        var iResolution = new Float32Array([glContextD.docCanvas.width * 1.0, glContextD.docCanvas.height * 1.0, 1.0]);
+        this.draw.SetUniformVec3("iResolution",iResolution);
+
+        /**
+         * 缓存开始绘制的时间
+         */
+        this.START_TIME = Date.parse(new Date()) / 1000; 
+
+        /**
+         * 传入iGlobalTime
+         */
+        var iGlobalTime = (Date.parse(new Date()) / 1000) - this.START_TIME;
+        this.draw.SetUniformFloat("iGlobalTime",iGlobalTime);
+    },
+
+    /**
+     * 实现图片回调用
+     */
+    ImgLoadCallBack: function (name,unit,img) {
+        var texture = Object.create(GLTexture);
+        texture.Init(this.glContext, img, unit);
+        
+        this.draw.SetUniformTexture(name, texture, unit);
+        this.draw.DoDraw();
     }
 };
 
 /**** SimpleRwi.js ****/
 
 /**
- * 灏佽浜哖rogram Redknot缂栧啓
+ * 封装了Program Redknot编写
  */
 var SimpleRwi = {
 
@@ -272,8 +356,9 @@ var SimpleRwi = {
         this.canvasId = canvasId;
         this.FilterName = FilterName;
 
-        var canvasElement = document.getElementById(canvasId);
-        this.glContext = canvasElement.getContext("experimental-webgl") || canvasElement.getContext("experimental-webgl");
+        var glContextD = Object.create(GLContext);
+        glContextD.Init(canvasId);
+        this.glContext = glContextD.glContext;
 
         var vertex = Object.create(GLShader);
         vertex.Init(this.glContext,"vertex",eval("vertex_" + FilterName));
@@ -300,18 +385,18 @@ var SimpleRwi = {
         this.draw.SetElementIndex(indicesData);
 
         /**
-         * 鍒涘缓璐村浘
+         * 创建贴图
          */
 
         var imageload = Object.create(ImageLoad);
-        ImageLoad.Init(imageSrc,this);
+        ImageLoad.Init(imageSrc,"mainTexture",0,this);
     },
 
-    CallBack: function (img) {
+    ImgLoadCallBack: function (name,unit,img) {
         var texture = Object.create(GLTexture);
-        texture.Init(this.glContext, img, this.glContext.TEXTURE0);
+        texture.Init(this.glContext, img, unit);
         
-        this.draw.SetUniformTexture("mainTexture", texture, 0);
+        this.draw.SetUniformTexture(name, texture, unit);
         this.draw.DoDraw();
 
         this.OnLoadImage();
