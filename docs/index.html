@@ -21,6 +21,13 @@
         $('#main_content').headsmart()
       })
     </script>
+
+    <style>
+        .rwi{
+            width:100%;
+            border-radius:20px;
+        }
+    </style>
     <title>RWI</title>
   </head>
 
@@ -53,7 +60,7 @@
             <img src="img/miaowu.jpg" style="width:100%"></img>
 
             <h5>扭曲动画</h5>
-            <canvas id="wave_animation" width="2000px" height="1500px" style="width:100%"></canvas>
+            <canvas id="wave_animation" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var img_src = "img/miaowu.jpg";
 
@@ -72,7 +79,7 @@
             </script>
 
             <h5>失焦动画</h5>
-            <canvas id="aberration_animation" width="2000px" height="1500px" style="width:100%"></canvas>
+            <canvas id="aberration_animation" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var image_aberration_animation = Object.create(SimpleRwi);
                 image_aberration_animation.Init("aberration_animation","aberration",img_src);
@@ -88,43 +95,36 @@
                 }
             </script>
 
-            <h5>高斯模糊</h5>
-            <canvas id="image_gaussian_blur" width="2000px" height="1500px" style="width:100%"></canvas>
-            <script>
-                var image_gaussian_blur = Object.create(SimpleRwi);
-                image_gaussian_blur.Init("image_gaussian_blur","gaussian_blur",img_src);
-            </script>
-
             <h5>灰度</h5>
-            <canvas id="image_gray" width="2000px" height="1500px" style="width:100%"></canvas>
+            <canvas id="image_gray" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var image_gray = Object.create(SimpleRwi);
                 image_gray.Init("image_gray","gray",img_src);
             </script>
 
             <h5>深褐色调</h5>
-            <canvas id="image_brown" width="2000px" height="1500px" style="width:100%"></canvas>
+            <canvas id="image_brown" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var image_brown = Object.create(SimpleRwi);
                 image_brown.Init("image_brown","brown",img_src);
             </script>
 
             <h5>红绿交换</h5>
-            <canvas id="image_redgreen" width="2000px" height="1500px" style="width:100%"></canvas>
+            <canvas id="image_redgreen" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var image_redgreen = Object.create(SimpleRwi);
                 image_redgreen.Init("image_redgreen","redgreen",img_src);
             </script>
 
             <h5>反色</h5>
-            <canvas id="image_inverse" width="2000px" height="1500px" style="width:100%"></canvas>
+            <canvas id="image_inverse" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var image_inverse = Object.create(SimpleRwi);
                 image_inverse.Init("image_inverse","inverse",img_src);
             </script>
 
             <h5>对比度调整</h5>
-            <canvas id="image_contrast" width="2000px" height="1500px" style="width:100%"></canvas>
+            <canvas id="image_contrast" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var image_contrast = Object.create(SimpleRwi);
                 image_contrast.Init("image_contrast","contrast",img_src);
