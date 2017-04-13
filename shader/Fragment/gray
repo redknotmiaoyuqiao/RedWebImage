@@ -1,0 +1,20 @@
+precision highp float;
+
+varying vec2 fragCoord;
+
+uniform vec3 resolution;
+uniform float globalTime;
+
+uniform sampler2D iChannel0;
+
+void main()
+{   
+    vec4 color = texture2D(iChannel0,fragCoord);
+    mat4 gray = mat4(
+        0.3, 0.6, 0.1, 0.0,
+        0.3, 0.6, 0.1, 0.0,
+        0.3, 0.6, 0.1, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    );
+    gl_FragColor = color * gray;
+}

@@ -13,8 +13,13 @@
     <script type="text/javascript" src="javascripts/modernizr.js"></script>
     <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
 
+    <!--
     <script type="text/javascript" src="javascripts/red-web-image.js"></script>
     <script type="text/javascript" src="javascripts/red-web-shader-lib.js"></script>
+    -->
+
+    <script type="text/javascript" src="../build/red-web-image.js"></script>
+    <script type="text/javascript" src="../build/red-web-shader-lib.js"></script>
 
     <script type="text/javascript">
       $(document).ready(function () {
@@ -65,12 +70,15 @@
                 var img_src = "img/miaowu.jpg";
                 
                 
+                
                 var SobelImage = Object.create(SimpleRwi);
                 SobelImage.Init("SobelImage","sobel");
 
                 var imageload = Object.create(ImageLoad);
                 ImageLoad.Init(img_src,"iChannel0",1,SobelImage);
             </script>
+
+
 
             <h5>高斯模糊</h5>
             <canvas id="GaussianImage" width="2000px" height="1500px" class="rwi"></canvas>
@@ -80,6 +88,17 @@
 
                 var imageload = Object.create(ImageLoad);
                 ImageLoad.Init(img_src,"iChannel0",1,GaussianImage);
+            </script>
+
+
+            <h5>灰度图</h5>
+            <canvas id="GrayImage" width="2000px" height="1500px" class="rwi"></canvas>
+            <script>
+                var GrayImage = Object.create(SimpleRwi);
+                GrayImage.Init("GrayImage","gray");
+
+                var imageload = Object.create(ImageLoad);
+                ImageLoad.Init(img_src,"iChannel0",1,GrayImage);
             </script>
       </section>
 
