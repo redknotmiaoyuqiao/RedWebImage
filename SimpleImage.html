@@ -23,11 +23,23 @@
             <h4>Shader Toy</h4>
             <canvas id="shaderToy" width="2000px" height="1500px" style="width:50%"></canvas>
             <script>
-                var shaderToyImg = Object.create(ShaderToyRwi);
-                shaderToyImg.Init("shaderToy","shaderToy");
+                /**
+                 * 首先，你要创建一个ShaderToyRwi，这是一个很好的模版类
+                 */ 
+                var SimpleRwiImage = Object.create(SimpleRwi);
 
+                /**
+                 * 第一个参数是ID，第二个是指定的shader
+                 */ 
+                SimpleRwiImage.Init("shaderToy","sobel");
+
+                /**
+                 * 通过 ImageLoad 你可以通过一个URL载入一张图片
+                 */ 
                 var imageload = Object.create(ImageLoad);
-                ImageLoad.Init("docs/img/miaowu.jpg","iChannel0",1,shaderToyImg);
+                ImageLoad.Init("docs/img/miaowu.jpg","iChannel0",1,SimpleRwiImage);
+
+                
             </script>
         </center>
     </body>

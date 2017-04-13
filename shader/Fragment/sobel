@@ -1,0 +1,48 @@
+precision highp float;
+
+varying vec2 fragCoord;
+
+uniform vec3 resolution;
+uniform float globalTime;
+
+uniform sampler2D iChannel0;
+
+float r = 5.0;
+
+vec3 brightness = vec3(0.2126, 0.7152, 0.0722);
+
+float rgb2gray(vec3 color) {
+    return dot(color.rgb, brightness);
+}
+
+float pixel_operator(float dx, float dy) {
+    vec4 rgba_color = texture2D( iChannel0, fragCoord + vec2(dx,dy) );
+    return rgb2gray(rgba_color.rgb);
+}
+
+float sobel_filter()
+{
+    float dx = (r * 1.0) / float(resolution.x);
+    float dy = (r * 1.0) / float(resolution.y);
+
+    float s00 = pixel_operator(-dx, dy);
+    float s10 = pixel_operator(-dx, 0.0);
+    float s20 = pixel_operator(-dx, -dy);
+    float s01 = pixel_operator(0.0, dy);
+    float s21 = pixel_operator(0.0, -dy);
+    float s02 = pixel_operator(dx, dy);
+    float s12 = pixel_operator(dx, 0.0);
+    float s22 = pixel_operator(dx, -dy);
+
+    float sx = s00 + 2.0 * s10 + s20 - (s02 + 2.0 * s12 + s22);
+    float sy = s00 + 2.0 * s01 + s02 - (s20 + 2.0 * s21 + s22);
+
+    float mag = length(vec2(sx, sy));
+
+    return mag;
+}
+
+void main(){
+    float graylevel = sobel_filter();
+    gl_FragColor = vec4(graylevel, graylevel, graylevel, 1.0);
+}
