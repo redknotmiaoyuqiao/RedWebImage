@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=640">
@@ -13,71 +14,102 @@
     <script type="text/javascript" src="javascripts/modernizr.js"></script>
     <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
 
-    
+
     <script type="text/javascript" src="javascripts/red-web-image.js"></script>
     <script type="text/javascript" src="javascripts/red-web-shader-lib.js"></script>
-   
+
 <!--
     <script type="text/javascript" src="../build/red-web-image.js"></script>
     <script type="text/javascript" src="../build/red-web-shader-lib.js"></script>
-     -->
+-->
 
     <script type="text/javascript">
-      $(document).ready(function () {
-        $('#main_content').headsmart()
-      })
+        $(document).ready(function() {
+            $('#main_content').headsmart()
+        })
     </script>
 
     <style>
-        .rwi{
-            width:100%;
-            border-radius:20px;
+        .rwi {
+            width: 100%;
+            border-radius: 20px;
+        }
+
+        .input_range {
+            width: 100%;
         }
     </style>
     <title>RWI</title>
-  </head>
+</head>
 
-  <body>
+<body>
     <a id="forkme_banner" href="https://github.com/redknotmiaoyuqiao/RedWebImage">View on GitHub</a>
     <div class="shell">
 
-      <header>
-        <span class="ribbon-outer">
+        <header>
+            <span class="ribbon-outer">
           <span class="ribbon-inner">
             <h1>Red Web Image</h1>
             <h2>(RWI，给予 WebGL 的 &ltimg\&gt)</h2>
           </span>
-          <span class="left-tail"></span>
-          <span class="right-tail"></span>
+            <span class="left-tail"></span>
+            <span class="right-tail"></span>
+            </span>
+        </header>
+
+        <div id="no-downloads">
+            <span class="inner">
         </span>
-      </header>
-
-      <div id="no-downloads">
-        <span class="inner">
-        </span>
-      </div>
+        </div>
 
 
-      <span class="banner-fix"></span>
+        <span class="banner-fix"></span>
 
 
-      <section id="main_content">
+        <section id="main_content">
             <h5>原图</h5>
-            <img src="img/miaowu.jpg" style="width:100%"></img>
+            <img src="img/miaowu.jpg" style="width:100%;border-radius:20px;"></img>
+
+
+
+
+
+
 
             <h5>Sobel 算子边缘检测</h5>
             <canvas id="SobelImage" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var img_src = "img/miaowu.jpg";
-                
-                
-                
+
+
+
                 var SobelImage = Object.create(SimpleRwi);
-                SobelImage.Init("SobelImage","sobel");
+                SobelImage.Init("SobelImage", "sobel");
+
+                SobelImage.draw.SetUniformFloat("r", 1.0);
 
                 var imageload = Object.create(ImageLoad);
-                ImageLoad.Init(img_src,"iChannel0",1,SobelImage);
+                ImageLoad.Init(img_src, "iChannel0", 1, SobelImage);
             </script>
+            半径:
+            <br>
+            <input id="input_sobel_range" class="input_range" type="range" min="1" max="20" step="0.1" value="1" />
+            <script>
+                document.getElementById("input_sobel_range").addEventListener(
+                    "change",
+                    function() {
+                        /**
+                         * 在拖动滑动条的时候，可以动态改变传入Shader中的参数
+                         */
+                        SobelImage.draw.SetUniformFloat("r", this.value);
+                        SobelImage.draw.DoDraw();
+                    }
+                );
+            </script>
+
+
+
+
 
 
 
@@ -85,38 +117,88 @@
             <canvas id="GaussianImage" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var GaussianImage = Object.create(SimpleRwi);
-                GaussianImage.Init("GaussianImage","gaussian_blur");
+                GaussianImage.Init("GaussianImage", "gaussian_blur");
 
                 var imageload = Object.create(ImageLoad);
-                ImageLoad.Init(img_src,"iChannel0",1,GaussianImage);
+                ImageLoad.Init(img_src, "iChannel0", 1, GaussianImage);
             </script>
+
+
+
+
 
 
             <h5>灰度图</h5>
             <canvas id="GrayImage" width="2000px" height="1500px" class="rwi"></canvas>
             <script>
                 var GrayImage = Object.create(SimpleRwi);
-                GrayImage.Init("GrayImage","gray");
+                GrayImage.Init("GrayImage", "gray");
 
                 var imageload = Object.create(ImageLoad);
-                ImageLoad.Init(img_src,"iChannel0",1,GrayImage);
+                ImageLoad.Init(img_src, "iChannel0", 1, GrayImage);
             </script>
-      </section>
 
-      <footer>
-        <span class="ribbon-outer">
+
+
+
+
+
+
+
+            <h5>Zoom Blur</h5>
+            <canvas id="ZoomImage" width="2000px" height="1500px" class="rwi"></canvas>
+            <script>
+                var ZoomImage = Object.create(SimpleRwi);
+                ZoomImage.Init("ZoomImage", "zoomblur");
+
+                var imageload = Object.create(ImageLoad);
+                ImageLoad.Init(img_src, "iChannel0", 1, ZoomImage);
+            </script>
+
+
+
+
+            <h5>Pinch</h5>
+            <canvas id="PinchImage" width="2000px" height="1500px" class="rwi"></canvas>
+            <script>
+                var PinchImage = Object.create(SimpleRwi);
+                PinchImage.Init("PinchImage", "pinch");
+
+                var imageload = Object.create(ImageLoad);
+                ImageLoad.Init(img_src, "iChannel0", 1, PinchImage);
+            </script>
+            半径:
+            <br>
+            <input id="input_pinch_range" class="input_range" type="range" min="-1" max="1" step="0.01" value="0" />
+            <script>
+                document.getElementById("input_pinch_range").addEventListener(
+                    "change",
+                    function() {
+                        /**
+                         * 在拖动滑动条的时候，可以动态改变传入Shader中的参数
+                         */
+                        PinchImage.draw.SetUniformFloat("r", this.value);
+                        PinchImage.draw.DoDraw();
+                    }
+                );
+            </script>
+        </section>
+
+        <footer>
+            <span class="ribbon-outer">
           <span class="ribbon-inner">
             <p>Projects by <a href="https://github.com/redknotmiaoyuqiao">redknotmiaoyuqiao</a> can be found on <a href="https://github.com/redknotmiaoyuqiao">GitHub</a></p>
           </span>
-          <span class="left-tail"></span>
-          <span class="right-tail"></span>
-        </span>
-        <p>Generated with <a href="https://pages.github.com">GitHub Pages</a> using Merlot</p>
-        <span class="octocat"></span>
-      </footer>
+            <span class="left-tail"></span>
+            <span class="right-tail"></span>
+            </span>
+            <p>Generated with <a href="https://pages.github.com">GitHub Pages</a> using Merlot</p>
+            <span class="octocat"></span>
+        </footer>
 
     </div>
 
-    
-  </body>
+
+</body>
+
 </html>

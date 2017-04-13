@@ -1,0 +1,35 @@
+precision highp float;
+
+varying vec2 fragCoord;
+
+uniform vec3 resolution;
+uniform float globalTime;
+
+uniform sampler2D iChannel0;
+
+
+uniform float r;
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec2 uv = fragCoord;
+
+    vec2 center = vec2( 0.5 );
+    vec2 dir = normalize( center - uv );
+    float d = length( center - uv );
+    float factor = r * -0.5;
+    float f = exp( factor * ( d - 0.5 ) ) - 1.0;
+    if( d > 0.5 ) {
+        f = 0.0;
+    }
+  
+    fragColor = texture2D( iChannel0, uv + f * dir );
+}
+
+
+
+void main()
+{   
+    mainImage(gl_FragColor,fragCoord);
+}
