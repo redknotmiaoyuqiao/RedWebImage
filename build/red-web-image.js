@@ -1,5 +1,26 @@
-/**** 创建时间为:2017-04-14 03:14:39 ****/
+/**** 创建时间为:2017-04-15 18:11:04 ****/
 
+
+/**** GLBuffer.js ****/
+
+var GLBuffer = {
+
+    glContext: null,
+    data: null,
+    size: null,
+
+    bufferId: null,
+
+    Init: function(glContext, data, size) {
+        this.glContext = glContext;
+        this.data = data;
+        this.size = size;
+
+        this.bufferId = this.glContext.createBuffer();
+        this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.bufferId);
+        this.glContext.bufferData(this.glContext.ARRAY_BUFFER, this.data, this.glContext.STATIC_DRAW);
+    }
+};
 
 /**** GLContext.js ****/
 
@@ -246,6 +267,39 @@ var ImageLoad = {
     }
 };
 
+/**** CustomRwi.js ****/
+
+var CustomRwi = {
+
+    canvasId: null,
+
+    glContext: null,
+
+    draw: null,
+
+    Init: function(canvasId, program) {
+        this.canvasId = canvasId;
+
+        var glContextD = Object.create(GLContext);
+        glContextD.Init(canvasId);
+        this.glContext = glContextD.glContext;
+
+        this.draw = Object.create(Draw);
+        this.draw.Init(this.glContext,program);
+    }
+
+    /**
+     * 实现图片回调用
+     */
+    ImgLoadCallBack: function (name,unit,img) {
+        var texture = Object.create(GLTexture);
+        texture.Init(this.glContext, img, unit);
+
+        this.draw.SetUniformTexture(name, texture, unit);
+        this.draw.DoDraw();
+    }
+};
+
 /**** SimpleRwi.js ****/
 
 /**
@@ -288,7 +342,7 @@ var SimpleRwi = {
 
         this.draw = Object.create(Draw);
         this.draw.Init(this.glContext,programV);
-        
+
         /**
          * 设置顶点
          */
@@ -316,7 +370,7 @@ var SimpleRwi = {
         /**
          * 缓存开始绘制的时间
          */
-        this.START_TIME = Date.parse(new Date()) / 1000; 
+        this.START_TIME = Date.parse(new Date()) / 1000;
 
         /**
          * 传入iGlobalTime
@@ -331,7 +385,7 @@ var SimpleRwi = {
     ImgLoadCallBack: function (name,unit,img) {
         var texture = Object.create(GLTexture);
         texture.Init(this.glContext, img, unit);
-        
+
         this.draw.SetUniformTexture(name, texture, unit);
         this.draw.DoDraw();
     }
