@@ -18,7 +18,7 @@
     <script type="text/javascript" src="javascripts/red-web-image.js"></script>
     <script type="text/javascript" src="javascripts/red-web-shader-lib.js"></script>
 
-<!--
+    <!--
     <script type="text/javascript" src="../build/red-web-image.js"></script>
     <script type="text/javascript" src="../build/red-web-shader-lib.js"></script>
 -->
@@ -50,7 +50,7 @@
             <span class="ribbon-outer">
           <span class="ribbon-inner">
             <h1>Red Web Image</h1>
-            <h2>(RWI，给予 WebGL 的 &ltimg\&gt)</h2>
+            <h2>(RWI，基于 WebGL 的 &ltimg\&gt)</h2>
           </span>
             <span class="left-tail"></span>
             <span class="right-tail"></span>
@@ -106,6 +106,31 @@
                     }
                 );
             </script>
+
+            <pre>
+var SobelImage = Object.create(SimpleRwi);
+/**
+  * Init方法，初始化，第一个参数是Canvas的参数，第二个是要使用的 Fragment Shader
+  */
+SobelImage.Init("SobelImage", "sobel");
+
+/**
+  * 为 Uniform 变量 r 设置一个值
+  */
+SobelImage.draw.SetUniformFloat("r", 1.0);
+
+/**
+  * 设置 Texture
+  */
+var imageload = Object.create(ImageLoad);
+ImageLoad.Init(img_src, "iChannel0", 1, SobelImage);
+
+/**
+  * 设置 Uniform 并且重新绘制
+  */
+SobelImage.draw.SetUniformFloat("r", this.value);
+SobelImage.draw.DoDraw();
+            </pre>
 
 
 
