@@ -1,4 +1,4 @@
-/**** 创建时间为:2017-04-15 18:11:04 ****/
+/**** 创建时间为:2017-04-21 02:35:02 ****/
 
 
 /**** GLBuffer.js ****/
@@ -286,7 +286,7 @@ var CustomRwi = {
 
         this.draw = Object.create(Draw);
         this.draw.Init(this.glContext,program);
-    }
+    },
 
     /**
      * 实现图片回调用
